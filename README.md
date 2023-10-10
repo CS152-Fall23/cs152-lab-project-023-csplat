@@ -3,7 +3,7 @@
 
 **Ivan Ao** hao003@ucr.edu fhzzzs
 
-**Niklas Zimmermann** nzimm012@ucr.edu Nikl4Z
+**Niklas Zimmermann** nzimm012@ucr.edu nzimm012
 
 **Nolan Fuliar-Abanes** nfuli001@uc.edu Nabanes06
 
