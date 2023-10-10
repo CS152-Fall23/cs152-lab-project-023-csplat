@@ -1,13 +1,13 @@
 # Team Members
-Steven Truong struo025@ucr.edu Steven-Eon
+**Steven Truong** struo025@ucr.edu Steven-Eon
 
-Ivan Ao    hao003@ucr.edu     fhzzzs
+**Ivan Ao** hao003@ucr.edu fhzzzs
 
-Niklas Zimmermann  nzimm012@ucr.edu
+**Niklas Zimmermann** nzimm012@ucr.edu Nikl4Z
 
-Nolan Fuliar-Abanes nfuli001@uc.edu Nabanes06
+**Nolan Fuliar-Abanes** nfuli001@uc.edu Nabanes06
 
-Mohamed Abuelreich mabue004@ucr.edu mabue004
+**Mohamed Abuelreich** mabue004@ucr.edu mabue004
 
 # C Splot (.csp): 
 <table>
