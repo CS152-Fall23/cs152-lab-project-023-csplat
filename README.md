@@ -68,4 +68,8 @@
         <br>
 	    @#)
     </tr>
+    <tr>
+	    <td><b>Functions (that can take multiple scalar arguments and return a single scalar result)</b></td>
+	    <td>[return Data Type] [FunctionName] ?[Arg, arg2, (...)]?</td>
+    </tr>
 </table>
