@@ -7,7 +7,7 @@
 
 **Nolan Fuliar-Abanes** nfuli001@uc.edu Nabanes06
 
-**Mohamed Abuelreich** mabue004@ucr.edu mabue004
+**Mohamed Abuelreich** mabue004@ucr.edu mohamedalr
 
 # C Splot (.csp): 
 <table>
