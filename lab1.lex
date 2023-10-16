@@ -10,29 +10,39 @@
 
 %option noyywrap
 
-IDENTIFIER  [a-z][a-z0-9_]*
+IDENTIFIER  [a-z_][a-zA-Z0-9_]*
 DIGIT       [0-9]
-SYMBOL      [\{\}\[\]\(\)\=\+\-\*\/\<\>\=\!=]
+SYMBOL      [\{\}\[\]\(\)\=\+\-\*\/\<\>\=\!=\?\\,;]
+KEYWORD     whilst|dowhilst|stop|if|elseif|else|read|write|void|int
 
 
 %%
-[ \t\r]+
+[ \t\r]+								{}
 {DIGIT}+                                                                {   printf("INT %d\n",atoi(yytext)); }
 :=                                                                      {   printf("ASSIGNMENT OPERATER %s\n", yytext);}
 >|=|<|!=                                                                {   printf("RELATION OPERATOR %s\n", yytext);}
-whilst|dowhilst|stop|if|elseif|else|read|write                          {   printf("KEYWORD %s\n", yytext);}
-#[^\n]*                                                                 /* eat up one-line comments */
-@#([^@]|(@+[^#]))*@#                                                    /* eat up mult-line comments */
-
+{KEYWORD}               						{   printf("KEYWORD %s\n", yytext);}
+#[^\n]*                                                                 {/* eat up one-line comments */}
+@#([^@]|(@+[^#]))*@#                                                    {/* eat up mult-line comments */}
+{SYMBOL}								{   printf("SYMBOL %s\n", yytext);}
 
 
 {IDENTIFIER}                                                            {   printf("IDENTIFIER %s\n", yytext); }
 
-\n          {   ++current_line; current_column = 0;}
-.           {   printf("Error at line %llu, col %llu : unrecognized symbol \"", current_line, current_column);
-                printf("%s\"", yytext);
-                yyterminate();
-            }
+\n          								{   ++current_line; current_column = 0;}
+
+[A-Z0-9][a-zA-Z0-9_]*							{ printf
+									  (
+									   "Error at line %llu, column %llu: identifier \"%s\" must begin with a lower-case letter or underscore!\n",
+									   current_line, current_column, yytext
+									  );
+									  yyterminate();
+									}
+
+.          								{   printf("Error at line %llu, col %llu : unrecognized symbol \"", current_line, current_column);
+                								printf("%s\"\n", yytext);
+                								yyterminate();
+            								}
 
 %%
 
