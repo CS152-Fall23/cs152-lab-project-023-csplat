@@ -14,7 +14,7 @@ DIGIT       [0-9]
 ASSIGNMENT  :=
 ARITHMETIC  \+|\-|\*|\/
 RELATION    >|=|<|!=
-SYMBOL      [\{\}\[\]\(\)\=\+\-\*\/\<\>\=\!=\?\\,;]
+SYMBOL      [\{\}\[\]\(\)\?\\,;]
 KEYWORD     whilst|dowhilst|stopZZZZ|when|elsewhen|else|read|write|void|int|return
 
 %%
