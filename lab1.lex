@@ -15,7 +15,7 @@ ASSIGNMENT  :=
 ARITHMETIC  \+|\-|\*|\/
 RELATION    >|=|<|!=
 SYMBOL      [\{\}\[\]\(\)\?\\,;]
-KEYWORD     whilst|dowhilst|stopZZZZ|when|elsewhen|else|read|write|void|int|return
+KEYWORD     whilst|dowhilst|stop|when|elsewhen|else|read|write|void|int|return
 
 %%
 [ \t\r]+								{}
