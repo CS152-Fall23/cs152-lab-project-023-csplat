@@ -25,9 +25,10 @@ program: stmts { printf("stmts\n");}
 | program stmt { printf("program stmt\n");}
 
 stmts: add_exp ASSIGN { printf("add_exp ASSIGN\n");}
+| exp { printf("exp\n");}
 
 stmt: when_stmt { printf("when_stmt\n");}
-| exp { printf("exp\n");}
+
 
 when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
 | WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
