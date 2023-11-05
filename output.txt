@@ -1,0 +1,12 @@
+NUM
+exp
+mul_exp
+NUM
+exp
+mul_exp
+add_exp ADD add_exp
+add_exp ASSIGN
+stmts
+NUM
+exp
+program stmt

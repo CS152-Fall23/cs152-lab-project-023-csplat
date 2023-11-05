@@ -21,9 +21,10 @@ RELOP		[>=<]|!=
 [ \t\r]+								{}
 {DIGIT}+                                {   yylval.num = atoi(yytext); return NUM; }
 
-[\+\-]									{	return ADDOP;	}
-"*"										{	return MULOP;	}
-"/"										{	return DIVOP;	}
+"+"										{	return ADD;	}
+"-"										{	return SUB;	}
+"*"										{	return MUL;	}
+"/"										{	return DIV;	}
 {RELOP}									{	return RELOP;	}
 {ASSIGNMENT}							{	return ASSIGN;	}
 

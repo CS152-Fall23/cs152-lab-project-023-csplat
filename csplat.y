@@ -11,7 +11,7 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE
 
-%left ADDOP MULOP DIVOP RELOP
+%left ADD SUB MUL DIV RELOP
 
 %union {
    int num;
@@ -21,18 +21,29 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %%
 
-program: stmts {}
+program: stmts { printf("stmts\n");}
+| program stmt { printf("program stmt\n");}
 
-stmts: stmt {}
+stmts: add_exp ASSIGN { printf("add_exp ASSIGN\n");}
 
-stmt: when_stmt {}
-| exp {}
+stmt: when_stmt { printf("when_stmt\n");}
+| exp { printf("exp\n");}
 
-when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC {}
-| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC {}
+when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
+| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 
-exp: NUM {}
-| L_PAREN exp R_PAREN {}
+add_exp: mul_exp { printf("mul_exp\n");}
+| add_exp ADD add_exp { printf("add_exp ADD add_exp\n");}
+| add_exp SUB add_exp { printf("add_exp SUB add_exp\n");}
+
+mul_exp: exp { printf("exp\n");}
+| mul_exp MUL mul_exp { printf("mul_exp MUL mul_exp\n");}
+| mul_exp DIV mul_exp { printf("mul_exp DIV mul_exp\n");}
+
+exp: NUM { printf("NUM\n");}
+| SUB exp { printf("SUB exp\n");}
+| L_PAREN add_exp R_PAREN { printf("L_PAREN add_exp R_PAREN\n");}
+
 
 %%
 
