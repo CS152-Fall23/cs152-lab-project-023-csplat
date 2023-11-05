@@ -11,7 +11,7 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE
 
-%left ADD SUB MUL DIV RELOP
+%left ADD SUB MUL DIV REL
 
 %union {
    int num;
@@ -26,12 +26,7 @@ program: stmts { printf("stmts\n");}
 
 stmts: add_exp ASSIGN { printf("add_exp ASSIGN\n");}
 | exp { printf("exp\n");}
-
-stmt: when_stmt { printf("when_stmt\n");}
-
-
-when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
-| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
+| add_exp REL NUM { printf("add_exp REL NUM\n");}
 
 add_exp: mul_exp { printf("mul_exp\n");}
 | add_exp ADD add_exp { printf("add_exp ADD add_exp\n");}
@@ -44,6 +39,12 @@ mul_exp: exp { printf("exp\n");}
 exp: NUM { printf("NUM\n");}
 | SUB exp { printf("SUB exp\n");}
 | L_PAREN add_exp R_PAREN { printf("L_PAREN add_exp R_PAREN\n");}
+
+stmt: when_stmt { printf("when_stmt\n");}
+
+when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
+| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
+
 
 
 %%

@@ -15,7 +15,7 @@ unsigned long long current_column = 0;
 IDENTIFIER  [a-z_][a-zA-Z0-9_]*
 DIGIT       [0-9]
 ASSIGNMENT  :=
-RELOP		[>=<]|!=
+REL		[>=<]|!=
 
 %%
 [ \t\r]+								{}
@@ -25,7 +25,7 @@ RELOP		[>=<]|!=
 "-"										{	return SUB;	}
 "*"										{	return MUL;	}
 "/"										{	return DIV;	}
-{RELOP}									{	return RELOP;	}
+{REL}									{	return REL;	}
 {ASSIGNMENT}							{	return ASSIGN;	}
 
 "("										{	return L_PAREN;	}
