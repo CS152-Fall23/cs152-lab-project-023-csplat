@@ -15,24 +15,41 @@ unsigned long long current_column = 0;
 IDENTIFIER  [a-z_][a-zA-Z0-9_]*
 DIGIT       [0-9]
 ASSIGNMENT  :=
-ARITHMETIC  \+|\-|\*|\/
-RELATION    >|=|<|!=
-SYMBOL      [\{\}\[\]\(\)\?\\,;]
-KEYWORD     whilst|dowhilst|stop|when|elsewhen|else|read|write|void|int|return
+RELOP		[>=<]|!=
 
 %%
 [ \t\r]+								{}
 {DIGIT}+                                {   yylval.num = atoi(yytext); return NUM; }
-{ASSIGNMENT}                            {   printf("ASSIGNMENT OPERATER %s\n", yytext);}
-{RELATION}                              {   printf("RELATION OPERATOR %s\n", yytext);}
-{ARITHMETIC}                            {   printf("ARITHMETIC OPERATOR %s\n", yytext);}
-{KEYWORD}               				{   printf("KEYWORD %s\n", yytext);}
-"("					{return L_PAREN;}
-")"					{return R_PAREN;}
+
+[\+\-]									{	return ADDOP;	}
+"*"										{	return MULOP;	}
+"/"										{	return DIVOP;	}
+{RELOP}									{	return RELOP;	}
+{ASSIGNMENT}							{	return ASSIGN;	}
+
+"("										{	return L_PAREN;	}
+")"										{	return R_PAREN;	}
+"{"										{	return LC;	}
+"}"										{	return RC;	}
+"?"										{	return QM;	}
+"["										{	return LB;	}
+"]"										{	return RB;	}
+"\\"									{	return ESCAPE;	}
+
+"whilst"								{	return WHILST;	}
+"do"									{	return DO;		}
+"stop"									{	return STOP;	}
+"when"									{	return WHEN;	}
+"else"									{	return ELSE;	}
+"read"									{	return READ;	}
+"write"									{	return WRITE;	}
+"void"									{	return VOID;	}
+"int"									{	return INT;		}
+"return"								{	return RETURN;	}
+
+{IDENTIFIER}                            {   return IDENTIFIER;	}
 #[^\n]*                                 {/* eat up one-line comments */}
 @#([^@]|(@+[^#]))*@#                    {/* eat up mult-line comments */}
-{SYMBOL}								{   printf("SYMBOL %s\n", yytext);}
-{IDENTIFIER}                            {   printf("IDENTIFIER %s\n", yytext); }
 \n          							{   ++current_line; current_column = 0;}
 
 [A-Z0-9][a-zA-Z0-9_]*					{ printf( "Error at line %llu, column %llu: identifier \"%s\" must begin with a lower-case letter or underscore!\n", current_line, current_column, yytext); 

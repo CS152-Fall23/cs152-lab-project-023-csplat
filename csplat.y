@@ -9,9 +9,9 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %define parse.error custom
 
-%token NUM L_PAREN R_PAREN LC RC WHEN ELSE
+%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE
 
-%left ADD SUB MUL DIV EQ
+%left ADDOP MULOP DIVOP RELOP
 
 %union {
    int num;
