@@ -1,12 +1,9 @@
-NUM
-exp
-mul_exp
-NUM
-exp
-mul_exp
-add_exp ADD add_exp
-add_exp ASSIGN
-stmts
-NUM
-exp
-program stmt
+exp -> NUM
+mul_exp -> exp
+add_exp -> mul_exp
+exp -> NUM
+mul_exp -> exp
+add_exp -> mul_exp
+add_exp -> add_exp ADD add_exp
+stmts -> add_exp ASSIGN
+program -> stmts
