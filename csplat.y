@@ -21,29 +21,29 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %%
 
-program: stmts { printf("stmts\n");}
-| program stmt { printf("program stmt\n");}
+program: stmts { printf("program -> stmts\n");}
+| program stmt { printf("program -> program stmt\n");}
 
-stmts: add_exp ASSIGN { printf("add_exp ASSIGN\n");}
-| exp { printf("exp\n");}
-| add_exp REL NUM { printf("add_exp REL NUM\n");}
+stmts: add_exp ASSIGN { printf("stmts -> add_exp ASSIGN\n");}
+| exp { printf("stmts -> exp\n");}
+| add_exp REL NUM { printf("stmts -> add_exp REL NUM\n");}
 
-add_exp: mul_exp { printf("mul_exp\n");}
-| add_exp ADD add_exp { printf("add_exp ADD add_exp\n");}
-| add_exp SUB add_exp { printf("add_exp SUB add_exp\n");}
+add_exp: mul_exp { printf("add_exp -> mul_exp\n");}
+| add_exp ADD add_exp { printf("add_exp -> add_exp ADD add_exp\n");}
+| add_exp SUB add_exp { printf("add_exp -> add_exp SUB add_exp\n");}
 
-mul_exp: exp { printf("exp\n");}
-| mul_exp MUL mul_exp { printf("mul_exp MUL mul_exp\n");}
-| mul_exp DIV mul_exp { printf("mul_exp DIV mul_exp\n");}
+mul_exp: exp { printf("mul_exp -> exp\n");}
+| mul_exp MUL mul_exp { printf("mul_exp -> mul_exp MUL mul_exp\n");}
+| mul_exp DIV mul_exp { printf("mul_exp -> mul_exp DIV mul_exp\n");}
 
-exp: NUM { printf("NUM\n");}
-| SUB exp { printf("SUB exp\n");}
-| L_PAREN add_exp R_PAREN { printf("L_PAREN add_exp R_PAREN\n");}
+exp: NUM { printf("exp -> NUM\n");}
+| SUB exp { printf("exp -> SUB exp\n");}
+| L_PAREN add_exp R_PAREN { printf("exp -> L_PAREN add_exp R_PAREN\n");}
 
-stmt: when_stmt { printf("when_stmt\n");}
+stmt: when_stmt { printf("stmt -> when_stmt\n");}
 
-when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
-| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
+when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
+| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 
 
 
