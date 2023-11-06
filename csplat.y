@@ -45,6 +45,8 @@ rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
 
 stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
+| whilst_stmt {printf("stmt -> whilst_stmt\n");}
+| dowhilst_stmt {printf("stmt -> dowhilst_stmt\n");}
 | function {printf("stmt -> function\n");}
 | return_stmt {printf("stmt -> return_stmt\n");}
 
@@ -54,6 +56,13 @@ return_stmt: RETURN SEMICOLON {printf("return_stmt -> RETURN SEMICOLON\n");}
 when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE when_stmt\n");}
+
+whilst_stmt: WHILST exp LC stmt RC { printf("whilst_stmt -> WHILST exp LC stmt RC\n");}
+| WHILST exp LC RC { printf("whilst_stmt -> WHILST exp LC RC\n");}
+
+dowhilst_stmt: DO LC stmt RC WHILST exp { printf("dowhilst_stmt -> DO LC stmt RC WHILST exp\n");}
+| DO LC RC WHILST exp { printf("dowhilst_stmt -> DO LC RC WHILST exp\n");}
+
 
 function: type IDENTIFIER QM param_type_list QM LC stmts RC {printf("function -> type IDENTIFIER QM param_type_list QM LC stmts RC\n");}
 
