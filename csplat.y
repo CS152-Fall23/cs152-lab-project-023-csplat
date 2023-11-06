@@ -9,21 +9,35 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %define parse.error custom
 
-%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE
+%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT INT_ARRAY RETURN ASSIGN QM ESCAPE SEMICOLON
 
 %left ADDOP MULOP DIVOP RELOP
 
 %union {
    int num;
+   char* identifier;
 }
 
 //%type<num> NUM stmt exp
+//%type<identifier> IDENTIFIER
 
 %%
 
 program: stmts {}
 
 stmts: stmt {}
+| stmts stmt {}
+
+stmt: declaration SEMICOLON {}
+| assignment SEMICOLON {}
+
+declaration: INT IDENTIFIER {}
+| INT INT_ARRAY IDENTIFIER LB NUM RB {}
+
+assignment: IDENTIFIER ASSIGN expression {}
+
+expression: NUM {}
+| IDENTIFIER LB NUM RB {}
 
 stmt: when_stmt {}
 | exp {}

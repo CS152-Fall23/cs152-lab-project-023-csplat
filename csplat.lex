@@ -25,15 +25,16 @@ RELOP		[>=<]|!=
 "*"										{	return MULOP;	}
 "/"										{	return DIVOP;	}
 {RELOP}									{	return RELOP;	}
-{ASSIGNMENT}							{	return ASSIGN;	}
+":="									{	return ASSIGN;	}
 
+";"										{	return SEMICOLON}
 "("										{	return L_PAREN;	}
 ")"										{	return R_PAREN;	}
-"{"										{	return LC;	}
-"}"										{	return RC;	}
-"?"										{	return QM;	}
-"["										{	return LB;	}
-"]"										{	return RB;	}
+"{"										{	return LC;		}
+"}"										{	return RC;		}
+"?"										{	return QM;		}
+"["										{	return LB;		}
+"]"										{	return RB;		}
 "\\"									{	return ESCAPE;	}
 
 "whilst"								{	return WHILST;	}
@@ -47,7 +48,7 @@ RELOP		[>=<]|!=
 "int"									{	return INT;		}
 "return"								{	return RETURN;	}
 
-{IDENTIFIER}                            {   return IDENTIFIER;	}
+{IDENTIFIER}                            { yylval.identifier = strdup(yytext); return IDENTIFIER; }
 #[^\n]*                                 {/* eat up one-line comments */}
 @#([^@]|(@+[^#]))*@#                    {/* eat up mult-line comments */}
 \n          							{   ++current_line; current_column = 0;}
