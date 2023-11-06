@@ -36,6 +36,8 @@ REL		[>=<]|!=
 "["										{	return LB;	}
 "]"										{	return RB;	}
 "\\"									{	return ESCAPE;	}
+";"										{	return SEMICOLON;	}
+","										{	return COMMA;	}
 
 "whilst"								{	return WHILST;	}
 "do"									{	return DO;		}
