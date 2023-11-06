@@ -57,10 +57,10 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN 
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE when_stmt\n");}
 
-whilst_stmt: WHILST exp LC stmt RC { printf("whilst_stmt -> WHILST exp LC stmt RC\n");}
+whilst_stmt: WHILST exp LC stmts RC { printf("whilst_stmt -> WHILST exp LC stmts RC\n");}
 | WHILST exp LC RC { printf("whilst_stmt -> WHILST exp LC RC\n");}
 
-dowhilst_stmt: DO LC stmt RC WHILST exp { printf("dowhilst_stmt -> DO LC stmt RC WHILST exp\n");}
+dowhilst_stmt: DO LC stmts RC WHILST exp { printf("dowhilst_stmt -> DO LC stmts RC WHILST exp\n");}
 | DO LC RC WHILST exp { printf("dowhilst_stmt -> DO LC RC WHILST exp\n");}
 
 
