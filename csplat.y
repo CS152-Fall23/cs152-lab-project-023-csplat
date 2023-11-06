@@ -25,19 +25,24 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 program: stmts {}
 
-stmts: stmt {}
-| stmts stmt {}
+stmts: stmt {printf("stmts -> stmt\n");}
+| stmts stmt {printf("stmts -> stmt\n");}
 
-stmt: declaration SEMICOLON {}
-| assignment SEMICOLON {}
+stmt: declaration SEMICOLON {printf("stmt -> declaration SEMICOLON\n");}
+| assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
 
-declaration: INT IDENTIFIER {}
-| INT INT_ARRAY IDENTIFIER LB NUM RB {}
+declaration: INT IDENTIFIER SEMICOLON {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+| INT INT_ARRAY IDENTIFIER LB NUM RB SEMICOLON{printf("declaration -> INT INT_ARRAY IDENTIFIER LB NUM RB SEMICOLON\n");}
 
-assignment: IDENTIFIER ASSIGN expression {}
+assignment: IDENTIFIER ASSIGN expression SEMICOLON {printf("assignment -> IDENTIFIER ASSIGN expression SEMICOLON\n");}
+| IDENTIFIER LB NUM RB ASSIGN expression SEMICOLON {printf("assignment -> IDENTIFIER LB NUM RB ASSIGN expression SEMICOLON\n");}
 
-expression: NUM {}
-| IDENTIFIER LB NUM RB {}
+expression: NUM {printf("expression -> NUM\n");}
+| IDENTIFIER {printf("expression -> IDENTIFIER\n");}
+| IDENTIFIER LB expression RB {printf("expression -> IDENTIFIER LB expression RB\n");}
+| expression ADDOP expression {printf("expression -> expression ADDOP expression\n");}
+| expression MULOP expression {printf("expression -> expression MULOP expression\n");}
+| L_PAREN expression R_PAREN {printf("expression -> L_PAREN expression R_PAREN\n");}
 
 stmt: when_stmt {}
 | exp {}
