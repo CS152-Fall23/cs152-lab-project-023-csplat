@@ -15,16 +15,17 @@ unsigned long long current_column = 0;
 IDENTIFIER  [a-z_][a-zA-Z0-9_]*
 DIGIT       [0-9]
 ASSIGNMENT  :=
-RELOP		[>=<]|!=
+REL		[>=<]|!=
 
 %%
 [ \t\r]+								{}
 {DIGIT}+                                {   yylval.num = atoi(yytext); return NUM; }
 
-[\+\-]									{	return ADDOP;	}
-"*"										{	return MULOP;	}
-"/"										{	return DIVOP;	}
-{RELOP}									{	return RELOP;	}
+"+"										{	return ADD;	}
+"-"										{	return SUB;	}
+"*"										{	return MUL;	}
+"/"										{	return DIV;	}
+{REL}									{	return REL;	}
 ":="									{	return ASSIGN;	}
 
 ";"										{	return SEMICOLON}
@@ -36,6 +37,8 @@ RELOP		[>=<]|!=
 "["										{	return LB;		}
 "]"										{	return RB;		}
 "\\"									{	return ESCAPE;	}
+";"										{	return SEMICOLON;	}
+","										{	return COMMA;	}
 
 "whilst"								{	return WHILST;	}
 "do"									{	return DO;		}

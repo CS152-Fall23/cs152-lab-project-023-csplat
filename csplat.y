@@ -9,9 +9,9 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %define parse.error custom
 
-%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT INT_ARRAY RETURN ASSIGN QM ESCAPE SEMICOLON
+%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT INT_ARRAY RETURN ASSIGN QM ESCAPE SEMICOLON COMMA
 
-%left ADDOP MULOP DIVOP RELOP
+%left ADD SUB MUL DIV REL
 
 %union {
    int num;
@@ -23,35 +23,61 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %%
 
-program: stmts {}
+program: stmts { printf("program -> stmts\n");}
 
-stmts: stmt {printf("stmts -> stmt\n");}
-| stmts stmt {printf("stmts -> stmt\n");}
+stmts: stmts stmt {printf("stmt -> stmt\n");}
+|stmt {printf("stmts -> stmt\n");}
 
-stmt: declaration SEMICOLON {printf("stmt -> declaration SEMICOLON\n");}
+add_exp: mul_exp { printf("add_exp -> mul_exp\n");}
+| add_exp ADD add_exp { printf("add_exp -> add_exp ADD add_exp\n");}
+| add_exp SUB add_exp { printf("add_exp -> add_exp SUB add_exp\n");}
+
+mul_exp: exp { printf("mul_exp -> exp\n");}
+| mul_exp MUL mul_exp { printf("mul_exp -> mul_exp MUL mul_exp\n");}
+| mul_exp DIV mul_exp { printf("mul_exp -> mul_exp DIV mul_exp\n");}
+
+exp: NUM { printf("exp -> NUM\n");}
+| SUB exp { printf("exp -> SUB exp\n");}
+| L_PAREN add_exp R_PAREN { printf("exp -> L_PAREN add_exp R_PAREN\n");}
+| rel_exp {printf("exp -> rel_exp\n");}
+| function_call {printf("exp -> function_call\n");}
+| IDENTIFIER {printf("exp -> IDENTIFIER\n");}
+
+rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
+
+stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
 | assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
+| when_stmt {printf("stmt -> when_stmt\n");}
+| function {printf("stmt -> function\n");}
+| return_stmt {printf("stmt -> return_stmt\n");}
 
-declaration: INT IDENTIFIER SEMICOLON {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
-| INT INT_ARRAY IDENTIFIER LB NUM RB SEMICOLON{printf("declaration -> INT INT_ARRAY IDENTIFIER LB NUM RB SEMICOLON\n");}
+return_stmt: RETURN SEMICOLON {printf("return_stmt -> RETURN SEMICOLON\n");}
+| RETURN add_exp SEMICOLON {printf("return_stmt -> RETURN add_exp SEMICOLON\n");}
 
-assignment: IDENTIFIER ASSIGN expression SEMICOLON {printf("assignment -> IDENTIFIER ASSIGN expression SEMICOLON\n");}
-| IDENTIFIER LB NUM RB ASSIGN expression SEMICOLON {printf("assignment -> IDENTIFIER LB NUM RB ASSIGN expression SEMICOLON\n");}
+when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC\n");}
+| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
+| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE when_stmt\n");}
 
-expression: NUM {printf("expression -> NUM\n");}
-| IDENTIFIER {printf("expression -> IDENTIFIER\n");}
-| IDENTIFIER LB expression RB {printf("expression -> IDENTIFIER LB expression RB\n");}
-| expression ADDOP expression {printf("expression -> expression ADDOP expression\n");}
-| expression MULOP expression {printf("expression -> expression MULOP expression\n");}
-| L_PAREN expression R_PAREN {printf("expression -> L_PAREN expression R_PAREN\n");}
+function: type IDENTIFIER QM param_type_list QM LC stmts RC {printf("function -> type IDENTIFIER QM param_type_list QM LC stmts RC\n");}
 
-stmt: when_stmt {}
-| exp {}
+function_call: IDENTIFIER QM param_list QM {printf("function_call -> IDENTIFIER QM add_exp QM\n");}
 
-when_stmt: WHEN L_PAREN exp R_PAREN LC stmts RC {}
-| WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC {}
+param_type_list: type IDENTIFIER COMMA param_type_list {printf("param_type_list -> type IDENTIFIER COMMA param_list\n");}
+| type IDENTIFIER {printf("param_list -> type IDENTIFIER\n");}
 
-exp: NUM {}
-| L_PAREN exp R_PAREN {}
+param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
+| add_exp {printf("param_list -> add_exp\n");}
+| {printf("param_list -> 'epsilon'\n");}
+
+type: VOID {printf("type -> VOID\n");}
+| INT {printf("type -> INT\n");}
+
+declaration: INT IDENTIFIER {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+| INT IDENTIFIER LB add_exp RB {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+
+assignment: IDENTIFIER ASSIGN add_exp {printf("assignment -> IDENTIFIER ASSIGN add_exp\n");}
+| IDENTIFIER LB add_exp RB ASSIGN add_exp {printf("assignment -> IDENTIFIER LB add_exp RB ASSIGN add_exp\n");}
+| INT IDENTIFIER ASSIGN add_exp {printf("assignment -> INT IDENTIFIER ASSIGN add_exp\n");}
 
 %%
 
