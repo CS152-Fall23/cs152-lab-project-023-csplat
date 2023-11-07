@@ -42,12 +42,15 @@ exp: NUM { printf("exp -> NUM\n");}
 | rel_exp {printf("exp -> rel_exp\n");}
 | function_call {printf("exp -> function_call\n");}
 | IDENTIFIER {printf("exp -> IDENTIFIER\n");}
+| IDENTIFIER LB add_exp RB {printf("param_list -> type IDENTIFIER LB RB\n");}
 
 rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
 
 stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
 | assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
+| whilst_stmt {printf("stmt -> whilst_stmt\n");}
+| dowhilst_stmt {printf("stmt -> dowhilst_stmt\n");}
 | function {printf("stmt -> function\n");}
 | return_stmt {printf("stmt -> return_stmt\n");}
 
@@ -58,12 +61,21 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN 
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE when_stmt\n");}
 
+whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { printf("whilst_stmt -> WHILST exp LC stmts RC\n");}
+| WHILST L_PAREN add_exp R_PAREN LC RC { printf("whilst_stmt -> WHILST exp LC RC\n");}
+
+dowhilst_stmt: DO LC stmts RC WHILST exp { printf("dowhilst_stmt -> DO LC stmts RC WHILST exp\n");}
+| DO LC RC WHILST exp { printf("dowhilst_stmt -> DO LC RC WHILST exp\n");}
+
+
 function: type IDENTIFIER QM param_type_list QM LC stmts RC {printf("function -> type IDENTIFIER QM param_type_list QM LC stmts RC\n");}
 
 function_call: IDENTIFIER QM param_list QM {printf("function_call -> IDENTIFIER QM add_exp QM\n");}
 
 param_type_list: type IDENTIFIER COMMA param_type_list {printf("param_type_list -> type IDENTIFIER COMMA param_list\n");}
+| type IDENTIFIER LB RB COMMA param_type_list {printf("param_type_list -> type IDENTIFIER LB RB COMMA param_type_list\n");}
 | type IDENTIFIER {printf("param_list -> type IDENTIFIER\n");}
+| type IDENTIFIER LB RB {printf("param_list -> type IDENTIFIER LB RB\n");}
 
 param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
 | add_exp {printf("param_list -> add_exp\n");}
