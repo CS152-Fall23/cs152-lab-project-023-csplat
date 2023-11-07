@@ -26,9 +26,8 @@ REL		[>=<]|!=
 "*"										{	return MUL;	}
 "/"										{	return DIV;	}
 {REL}									{	return REL;	}
-":="									{	return ASSIGN;	}
+{ASSIGNMENT}							{	return ASSIGN;	}
 
-";"										{	return SEMICOLON}
 "("										{	return L_PAREN;	}
 ")"										{	return R_PAREN;	}
 "{"										{	return LC;		}
