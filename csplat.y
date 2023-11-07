@@ -9,7 +9,7 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %define parse.error custom
 
-%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE SEMICOLON COMMA
+%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT INT_ARRAY RETURN ASSIGN QM ESCAPE SEMICOLON COMMA
 
 %left ADD SUB MUL DIV REL
 
@@ -40,10 +40,12 @@ exp: NUM { printf("exp -> NUM\n");}
 | rel_exp {printf("exp -> rel_exp\n");}
 | function_call {printf("exp -> function_call\n");}
 | IDENTIFIER {printf("exp -> IDENTIFIER\n");}
+| IDENTIFIER LB add_exp RB {printf("param_list -> type IDENTIFIER LB RB\n");}
 
 rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
 
-stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
+stmt: declaration SEMICOLON {printf("stmt -> declaration SEMICOLON\n");}
+| assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
 | whilst_stmt {printf("stmt -> whilst_stmt\n");}
 | dowhilst_stmt {printf("stmt -> dowhilst_stmt\n");}
@@ -57,8 +59,8 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN 
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN exp R_PAREN LC stmts RC ELSE when_stmt\n");}
 
-whilst_stmt: WHILST exp LC stmts RC { printf("whilst_stmt -> WHILST exp LC stmts RC\n");}
-| WHILST exp LC RC { printf("whilst_stmt -> WHILST exp LC RC\n");}
+whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { printf("whilst_stmt -> WHILST exp LC stmts RC\n");}
+| WHILST L_PAREN add_exp R_PAREN LC RC { printf("whilst_stmt -> WHILST exp LC RC\n");}
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { printf("dowhilst_stmt -> DO LC stmts RC WHILST exp\n");}
 | DO LC RC WHILST exp { printf("dowhilst_stmt -> DO LC RC WHILST exp\n");}
@@ -69,7 +71,9 @@ function: type IDENTIFIER QM param_type_list QM LC stmts RC {printf("function ->
 function_call: IDENTIFIER QM param_list QM {printf("function_call -> IDENTIFIER QM add_exp QM\n");}
 
 param_type_list: type IDENTIFIER COMMA param_type_list {printf("param_type_list -> type IDENTIFIER COMMA param_list\n");}
+| type IDENTIFIER LB RB COMMA param_type_list {printf("param_type_list -> type IDENTIFIER LB RB COMMA param_type_list\n");}
 | type IDENTIFIER {printf("param_list -> type IDENTIFIER\n");}
+| type IDENTIFIER LB RB {printf("param_list -> type IDENTIFIER LB RB\n");}
 
 param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
 | add_exp {printf("param_list -> add_exp\n");}
@@ -77,6 +81,13 @@ param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
 
 type: VOID {printf("type -> VOID\n");}
 | INT {printf("type -> INT\n");}
+
+declaration: INT IDENTIFIER {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+| INT IDENTIFIER LB add_exp RB {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+
+assignment: IDENTIFIER ASSIGN add_exp {printf("assignment -> IDENTIFIER ASSIGN add_exp\n");}
+| IDENTIFIER LB add_exp RB ASSIGN add_exp {printf("assignment -> IDENTIFIER LB add_exp RB ASSIGN add_exp\n");}
+| INT IDENTIFIER ASSIGN add_exp {printf("assignment -> INT IDENTIFIER ASSIGN add_exp\n");}
 
 %%
 
