@@ -15,8 +15,8 @@ void bubbleSort ?int arr[], int n?
                 a[i] := a[j];
                 a[j] := temp;
             }
-            j = j + 1;
+            j := j + 1;
         }
-        i = i + 1;
+        i := i + 1;
     }
 }
