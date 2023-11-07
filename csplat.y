@@ -9,15 +9,17 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %define parse.error custom
 
-%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT RETURN ASSIGN QM ESCAPE SEMICOLON COMMA
+%token NUM IDENTIFIER L_PAREN R_PAREN LC RC RB LB WHEN ELSE WHILST DO STOP READ WRITE VOID INT INT_ARRAY RETURN ASSIGN QM ESCAPE SEMICOLON COMMA
 
 %left ADD SUB MUL DIV REL
 
 %union {
    int num;
+   char* identifier;
 }
 
 //%type<num> NUM stmt exp
+//%type<identifier> IDENTIFIER
 
 %%
 
@@ -44,6 +46,7 @@ exp: NUM { printf("exp -> NUM\n");}
 rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
 
 stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
+| assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
 | function {printf("stmt -> function\n");}
 | return_stmt {printf("stmt -> return_stmt\n");}
@@ -68,6 +71,13 @@ param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
 
 type: VOID {printf("type -> VOID\n");}
 | INT {printf("type -> INT\n");}
+
+declaration: INT IDENTIFIER {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+| INT IDENTIFIER LB add_exp RB {printf("declaration -> INT IDENTIFIER SEMICOLON\n");}
+
+assignment: IDENTIFIER ASSIGN add_exp {printf("assignment -> IDENTIFIER ASSIGN add_exp\n");}
+| IDENTIFIER LB add_exp RB ASSIGN add_exp {printf("assignment -> IDENTIFIER LB add_exp RB ASSIGN add_exp\n");}
+| INT IDENTIFIER ASSIGN add_exp {printf("assignment -> INT IDENTIFIER ASSIGN add_exp\n");}
 
 %%
 
