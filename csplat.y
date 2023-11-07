@@ -47,6 +47,8 @@ exp: NUM { printf("exp -> NUM\n");}
 rel_exp: exp REL exp {printf("rel_exp -> exp REL exp\n");}
 
 stmt: assignment {printf("stmt -> assignment\n");}
+| WRITE L_PAREN param_list R_PAREN SEMICOLON {printf("stmt -> WRITE L_PAREN param_list R_PAREN SEMICOLON\n");}
+| READ L_PAREN param_list R_PAREN SEMICOLON {printf("stmt -> READ L_PAREN param_list R_PAREN SEMICOLON\n");}
 | declaration {printf("stmt -> declaration\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
 | whilst_stmt {printf("stmt -> whilst_stmt\n");}
