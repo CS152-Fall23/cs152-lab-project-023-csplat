@@ -15,9 +15,11 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 
 %union {
    int num;
+   char* identifier;
 }
 
 //%type<num> NUM stmt exp
+//%type<identifier> IDENTIFIER
 
 %%
 
@@ -44,7 +46,7 @@ exp: NUM { printf("exp -> NUM\n");}
 
 rel_exp: exp REL exp {printf("rel_exp -> add_exp REL ad_exp\n");}
 
-stmt: declaration SEMICOLON {printf("stmt -> declaration SEMICOLON\n");}
+stmt: IDENTIFIER ASSIGN add_exp SEMICOLON { printf("stmt -> IDENTIFIER ASSIGN exp\n");}
 | assignment SEMICOLON {printf("stmt -> assignment SEMICOLON\n");}
 | when_stmt {printf("stmt -> when_stmt\n");}
 | whilst_stmt {printf("stmt -> whilst_stmt\n");}
