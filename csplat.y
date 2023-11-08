@@ -100,9 +100,17 @@ static int yyreport_syntax_error(const yypcontext_t *ctx) {
 	
 	fprintf(stderr, "\n-- Syntax Error --\n");
 	fprintf(stderr, "%llu line, %llu column\n", current_line, current_column);
-	fprintf(stderr, "Token causing error: %s\n", yysymbol_name(tokenCausingError));
-	for (int i = 0; i < numExpectedTokens; ++i) {
-		fprintf(stderr, " expected token (%d/%d): %s\n", i+1, numExpectedTokens, yysymbol_name(expectedTokens[i]));
+	if (yysymbol_name(tokenCausingError) == "REL") {
+		for (int i = 0; i < numExpectedTokens; i++) {
+			if (yysymbol_name(expectedTokens[i]) == "ASSIGN") {
+				printf("Assignment operator was expected. Found '=' instead\n");
+			}
+		}
+	} else {
+		fprintf(stderr, "Token causing error: %s\n", yysymbol_name(tokenCausingError));
+		for (int i = 0; i < numExpectedTokens; ++i) {
+			fprintf(stderr, " expected token (%d/%d): %s\n", i+1, numExpectedTokens, yysymbol_name(expectedTokens[i]));
+		}
 	}
 	return 0;
 }
