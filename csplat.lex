@@ -19,13 +19,13 @@ REL		[>=<]|!=
 
 %%
 [ \t\r]+								{}
-{DIGIT}+                                {   yylval.num = atoi(yytext); return NUM; }
+{DIGIT}+                                {   yylval.identifier = strdup(yytext); return NUM; }
 
 "+"										{	return ADD;	}
 "-"										{	return SUB;	}
 "*"										{	return MUL;	}
 "/"										{	return DIV;	}
-{REL}									{	return REL;	}
+{REL}									{	yylval.identifier = strdup(yytext); return REL;	}
 {ASSIGNMENT}							{	return ASSIGN;	}
 
 "("										{	return L_PAREN;	}

@@ -1,9 +1,29 @@
 %{
-#include "stdio.h"
+#include <stdio.h>
+#include <string.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 int yylex (void);
 
 void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1); }
+
+static char* genTempName() {
+	static unsigned long long counter;
+	static char buff[4096]; sprintf(buff, "temp%llu", counter++);
+	return strdup(buff);
+}
+
+typedef struct { char **data; size_t len; } Vec;
+
+static void VecPush(Vec *vec, char *cstring) {
+	if ( !(vec->data = realloc(vec->data, sizeof(char *)*(vec->len + 1)))) {
+		printf("bad_alloc\n"); exit(-1);
+	}
+	vec->data[vec->len++] = cstring;
+}
+
+static Vec vec;
 
 %}
 
@@ -14,82 +34,149 @@ void yyerror (char const *err) { fprintf(stderr, "yyerror: %s\n", err); exit(-1)
 %left ADD SUB MUL DIV REL
 
 %union {
-   int num;
    char* identifier;
 }
 
-//%type<num> NUM stmt exp
-//%type<identifier> IDENTIFIER
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp
 
 %%
 
-program: stmts { printf("program -> stmts\n");}
+program: { printf("func main\n"); } stmts { printf("endfunc\n"); } {}
 
-stmts: stmts stmt {printf("stmts -> stmt\n");}
-|stmt {printf("stmts -> stmt\n");}
+stmts: stmts stmt {}
+|stmt {}
 
-add_exp: mul_exp { printf("add_exp -> mul_exp\n");}
-| add_exp ADD add_exp { printf("add_exp -> add_exp ADD add_exp\n");}
-| add_exp SUB add_exp { printf("add_exp -> add_exp SUB add_exp\n");}
+add_exp: mul_exp {
+	$$ = $1;
+}
+| add_exp ADD add_exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("+ %s, %s, %s\n", name, $1, $3);
+	$$ = name;
+}
+| add_exp SUB add_exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("- %s, %s, %s\n", name, $1, $3);
+	$$ = name;
+}
 
-mul_exp: exp { printf("mul_exp -> exp\n");}
-| mul_exp MUL mul_exp { printf("mul_exp -> mul_exp MUL mul_exp\n");}
-| mul_exp DIV mul_exp { printf("mul_exp -> mul_exp DIV mul_exp\n");}
+mul_exp: exp {
+	$$ = $1;
+}
+| mul_exp MUL mul_exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("* %s, %s, %s\n", name, $1, $3);
+	$$ = name;
+}
+| mul_exp DIV mul_exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("/ %s, %s, %s\n", name, $1, $3);
+	$$ = name;
+}
 
-exp: NUM { printf("exp -> NUM\n");}
-| SUB exp { printf("exp -> SUB exp\n");}
-| L_PAREN add_exp R_PAREN { printf("exp -> L_PAREN add_exp R_PAREN\n");}
-| rel_exp {printf("exp -> rel_exp\n");}
-| function_call {printf("exp -> function_call\n");}
-| IDENTIFIER {printf("exp -> IDENTIFIER\n");}
-| IDENTIFIER LB add_exp RB {printf("exp -> IDENTIFIER LB add_exp RB\n");}
+exp: NUM {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("= %s, %s\n", name, $1);
+	$$ = $1;
+}
+| SUB exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("- %s, 0, %s\n", name, $2);
+	$$ = name;
+}
+| L_PAREN add_exp R_PAREN {
+	$$ = $2;
+}
+| rel_exp {
+	$$ = $1;
+}
+| function_call {
+	$$ = $1;
+}
+| IDENTIFIER {
+	$$ = $1;
+}
+| IDENTIFIER LB add_exp RB {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("=[] %s, %s, %s\n", name, $1, $3);
+	$$ = name;
+}
 
-rel_exp: exp REL exp {printf("rel_exp -> exp REL exp\n");}
+rel_exp: exp REL exp {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("%s %s, %s, %s\n", $2, name, $1, $3);
+}
 
-stmt: assignment {printf("stmt -> assignment\n");}
-| WRITE L_PAREN param_list R_PAREN SEMICOLON {printf("stmt -> WRITE L_PAREN param_list R_PAREN SEMICOLON\n");}
-| READ L_PAREN param_list R_PAREN SEMICOLON {printf("stmt -> READ L_PAREN param_list R_PAREN SEMICOLON\n");}
-| declaration {printf("stmt -> declaration\n");}
-| when_stmt {printf("stmt -> when_stmt\n");}
-| whilst_stmt {printf("stmt -> whilst_stmt\n");}
-| dowhilst_stmt {printf("stmt -> dowhilst_stmt\n");}
-| function {printf("stmt -> function\n");}
-| return_stmt {printf("stmt -> return_stmt\n");}
+stmt: assignment {}
+| WRITE L_PAREN param_list R_PAREN SEMICOLON {}
+| READ L_PAREN param_list R_PAREN SEMICOLON {}
+| declaration {}
+| when_stmt {}
+| whilst_stmt {}
+| dowhilst_stmt {}
+| function {}
+| return_stmt {}
 
-return_stmt: RETURN SEMICOLON {printf("return_stmt -> RETURN SEMICOLON\n");}
-| RETURN add_exp SEMICOLON {printf("return_stmt -> RETURN add_exp SEMICOLON\n");}
+return_stmt: RETURN SEMICOLON {
+	printf("ret 0\n");
+}
+| RETURN add_exp SEMICOLON {
+	printf("ret %s\n", $2);
+}
 
-when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { printf("when_stmt -> WHEN L_PAREN add_exp R_PAREN LC stmts RC\n");}
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { printf("when_stmt -> WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC\n");}
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { printf("when_stmt -> WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt\n");}
+when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { }
+| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { }
+| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { }
 
-whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { printf("whilst_stmt -> WHILST add_exp LC stmts RC\n");}
-| WHILST L_PAREN add_exp R_PAREN LC RC { printf("whilst_stmt -> WHILST add_exp LC RC\n");}
+whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { }
+| WHILST L_PAREN add_exp R_PAREN LC RC { }
 
-dowhilst_stmt: DO LC stmts RC WHILST exp { printf("dowhilst_stmt -> DO LC stmts RC WHILST exp\n");}
-| DO LC RC WHILST exp { printf("dowhilst_stmt -> DO LC RC WHILST exp\n");}
+dowhilst_stmt: DO LC stmts RC WHILST exp { }
+| DO LC RC WHILST exp { }
 
-function: type IDENTIFIER QM param_type_list QM LC stmts RC {printf("function -> type IDENTIFIER QM param_type_list QM LC stmts RC\n");}
+function: type IDENTIFIER QM param_type_list { printf("func %s\n", $2); } QM LC stmts RC {
+	printf("endfunc\n");
+}
 
-function_call: IDENTIFIER QM param_list QM {printf("function_call -> IDENTIFIER QM add_exp QM\n");}
+function_call: IDENTIFIER QM param_list QM {}
 
-param_type_list: type IDENTIFIER COMMA param_type_list {printf("param_type_list -> type IDENTIFIER COMMA param_type_list\n");}
-| type IDENTIFIER LB RB COMMA param_type_list {printf("param_type_list -> type IDENTIFIER LB RB COMMA param_type_list\n");}
-| type IDENTIFIER {printf("param_list -> type IDENTIFIER\n");}
-| type IDENTIFIER LB RB {printf("param_list -> type IDENTIFIER LB RB\n");}
+param_type_list: type IDENTIFIER COMMA param_type_list {}
+| type IDENTIFIER LB RB COMMA param_type_list {}
+| type IDENTIFIER {}
+| type IDENTIFIER LB RB {}
 
-param_list: add_exp COMMA {printf("param_list -> add_exp COMMA\n");}
-| add_exp {printf("param_list -> add_exp\n");}
-| {printf("param_list -> 'epsilon'\n");}
+param_list: add_exp COMMA {}
+| add_exp {}
+| {}
 
-type: VOID {printf("type -> VOID\n");}
-| INT {printf("type -> INT\n");}
+type: VOID {}
+| INT {}
 
-declaration: type IDENTIFIER SEMICOLON {printf("declaration -> type IDENTIFIER SEMICOLON\n");}
-| type IDENTIFIER LB add_exp RB SEMICOLON {printf("declaration -> type IDENTIFIER LB add_exp RB SEMICOLON\n");}
+declaration: type IDENTIFIER SEMICOLON {
+	printf(". %s\n", $2);
+}
+| type IDENTIFIER LB NUM RB SEMICOLON {
+	printf(".[] %s, %s\n", $2, $4);
+}
 
-assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {printf("assignment -> IDENTIFIER ASSIGN add_exp\n");}
-| IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {printf("assignment -> IDENTIFIER LB add_exp RB ASSIGN add_exp\n");}
+assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("= %s, %s\n", name, $3);
+}
+| IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
+	char* name = genTempName();
+	printf(". %s\n", name);
+	printf("[]= %s, %s, %s\n", name, $3, $6);
+}
 
 %%
 
