@@ -116,8 +116,12 @@ rel_exp: exp REL exp {
 }
 
 stmt: assignment {}
-| WRITE L_PAREN param_list R_PAREN SEMICOLON {}
-| READ L_PAREN param_list R_PAREN SEMICOLON {}
+| WRITE L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+	printf(".> %s\n", $3);
+}
+| READ L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+	printf(".< %s\n", $3);
+}
 | declaration {}
 | when_stmt {}
 | whilst_stmt {}
