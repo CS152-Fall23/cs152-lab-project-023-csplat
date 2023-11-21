@@ -25,6 +25,19 @@ static void VecPush(Vec *vec, char *cstring) {
 
 static Vec vec;
 
+int variableExists(char *var) {
+	for (int i = 0; i < vec.len; ++i) {
+		if (0 == strcmp(vec.data[i], var)) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void printSemanticError() {
+	fprintf(stderr, "Error line %llu, column %llu: ", current_line, current_column);
+}
+
 %}
 
 %define parse.error custom
@@ -100,9 +113,19 @@ exp: NUM {
 	$$ = $1;
 }
 | IDENTIFIER {
+	if (!variableExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Undefined variable '%s'\n", $1);
+		exit(-1);
+	}
 	$$ = $1;
 }
 | IDENTIFIER LB add_exp RB {
+	if (!variableExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Undefined variable '%s'\n", $1);
+		exit(-1);
+	}
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("=[] %s, %s, %s\n", name, $1, $3);
@@ -116,8 +139,12 @@ rel_exp: exp REL exp {
 }
 
 stmt: assignment {}
-| WRITE L_PAREN param_list R_PAREN SEMICOLON {}
-| READ L_PAREN param_list R_PAREN SEMICOLON {}
+| WRITE L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+	printf(".> %s\n", $3);
+}
+| READ L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+	printf(".< %s\n", $3);
+}
 | declaration {}
 | when_stmt {}
 | whilst_stmt {}
@@ -161,9 +188,16 @@ type: VOID {}
 | INT {}
 
 declaration: type IDENTIFIER SEMICOLON {
+	VecPush(&vec, $2);
 	printf(". %s\n", $2);
 }
 | type IDENTIFIER LB NUM RB SEMICOLON {
+	VecPush(&vec, $2);
+	if (atoi($4) <= 0) {
+		printSemanticError();
+		fprintf(stderr, "Array size must be greater than zero!\n");
+		exit(-1);
+	}
 	printf(".[] %s, %s\n", $2, $4);
 }
 
