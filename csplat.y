@@ -35,7 +35,7 @@ int variableExists(char *var) {
 }
 
 void printSemanticError() {
-	fprintf(stderr, "Error line %llu, column %llu: ", current_line, current_column);
+	fprintf(stderr, "Error line %llu: ", current_line);
 }
 
 %}
@@ -207,9 +207,7 @@ assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
 	printf("= %s, %s\n", name, $3);
 }
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("[]= %s, %s, %s\n", name, $3, $6);
+	printf("[]= %s, %s, %s\n", $1, $3, $6);
 }
 
 %%
