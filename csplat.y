@@ -188,10 +188,20 @@ type: VOID {}
 | INT {}
 
 declaration: type IDENTIFIER SEMICOLON {
+	if (variableExists($2)) {
+		printSemanticError();
+		fprintf(stderr, "Variable '%s' already defined in scope. \n", $2);
+		exit(-1);
+	}
 	VecPush(&vec, $2);
 	printf(". %s\n", $2);
 }
 | type IDENTIFIER LB NUM RB SEMICOLON {
+	if (variableExists($2)) {
+		printSemanticError();
+		fprintf(stderr, "Variable '%s' already defined in scope. \n", $2);
+		exit(-1);
+	}
 	VecPush(&vec, $2);
 	if (atoi($4) <= 0) {
 		printSemanticError();
