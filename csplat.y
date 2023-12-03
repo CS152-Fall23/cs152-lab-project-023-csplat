@@ -69,7 +69,7 @@ void printSemanticError() {
 
 %type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp 
 
-%type<control_flow> when_head whilst_stmt
+%type<control_flow> when_head whilst_stmt whilst_head
 
 %%
 
@@ -190,13 +190,6 @@ when_stmt: when_head LC stmts RC {
 	printf(": %s\n", $1.l2);
 }
 
-<<<<<<< HEAD
-else_stmt: ELSE {
-	printf(": %s\n", genLabelName(-1));
-} LC stmts RC{
-	printf(": %s\n", genLabelName(-1));
-	printf(":= %s\n", genLabelName(-2));
-=======
 when_head: WHEN L_PAREN add_exp R_PAREN {
 	char* name = genTempName();
 	$$.l1 = genLabelName(0);
@@ -204,20 +197,20 @@ when_head: WHEN L_PAREN add_exp R_PAREN {
 	printf(". %s\n", name);
 	printf("! %s, %s\n", name, $3);
 	printf("?:= %s, %s\n", $$.l2, name);
->>>>>>> 413e04d5406dc0cbc3c7c3af63fadf8d3bb21c21
 }
 
-whilst_stmt: WHILST L_PAREN add_exp R_PAREN {
+whilst_stmt: whilst_head LC stmts RC {
+	printf("?:= %s\n", $1.l1);			//goto beginlabel
+	printf(": %s\n", $1.l2);			//endlabel
+}
+whilst_head: WHILST L_PAREN add_exp R_PAREN{
 	char* name = genTempName();
-	char* beginLabel = genLabelName(0);
-	char* endLabel = genLabelName(0);
-	printf(": %s\n", beginLabel);				//print lable name
+	$$.l1 = genLabelName(0);					//beginLabel
+	$$.l2 = genLabelName(0);					//endlabel
+	printf(": %s\n", $$.l1);					//print begin lable name
 	printf(". %s\n", name);						//print temp for add_exp
 	printf("! %s, %s\n", name, $3);				//compare 
-	printf("?:= %s, %s\n", endLabel, name);		//if true goto endlabel
-} LC stmts RC {
-	printf("?:= %s\n", beginLabel);		//goto beginlabel
-	printf(": %s\n", endLabel);			//endlabel
+	printf("?:= %s, %s\n", $$.l2, name);		//if true goto endlabel
 }
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }
