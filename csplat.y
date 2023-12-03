@@ -14,6 +14,18 @@ static char* genTempName() {
 	return strdup(buff);
 }
 
+static char* genLabelName(int offset) {
+	static unsigned long long counter;
+	static char buff[4096];
+	
+	switch(offset) {
+		case 0: { sprintf(buff, "label%llu", counter++);} break;
+		default: { sprintf(buff, "label%llu", counter + offset);} break;
+	}
+
+	return strdup(buff);
+}
+
 typedef struct { char **data; size_t len; } Vec;
 
 static void VecPush(Vec *vec, char *cstring) {
