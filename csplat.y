@@ -14,6 +14,12 @@ static char* genTempName() {
 	return strdup(buff);
 }
 
+static char* genLabelName() {
+	static unsigned long long lbcounter;
+	static char lbbuff[4096]; sprintf(lbbuff, "label%llu", lbcounter++);
+	return strdup(lbbuff);
+}
+
 typedef struct { char **data; size_t len; } Vec;
 
 static void VecPush(Vec *vec, char *cstring) {
@@ -50,7 +56,7 @@ void printSemanticError() {
    char* identifier;
 }
 
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_stmt
 
 %%
 
@@ -163,7 +169,10 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { }
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { }
 | WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { }
 
-whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { }
+whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC
+{ 
+	printf("1231231\n");
+}
 | WHILST L_PAREN add_exp R_PAREN LC RC { }
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }

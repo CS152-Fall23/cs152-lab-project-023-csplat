@@ -1,0 +1,17 @@
+func main
+func bubbleSort
+. i
+. j
+. temp
+. temp0
+= temp0, 0
+. temp1
+= temp1, 0
+. temp2
+= temp2, 0
+. temp3
+= temp3, 0
+. temp4
+= temp4, 0
+. temp5
+= temp5, 0
