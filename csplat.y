@@ -14,10 +14,16 @@ static char* genTempName() {
 	return strdup(buff);
 }
 
-static char* genLabelName() {
-	static unsigned long long lbcounter;
-	static char lbbuff[4096]; sprintf(lbbuff, "label%llu", lbcounter++);
-	return strdup(lbbuff);
+static char* genLabelName(int offset) {
+	static unsigned long long counter;
+	static char buff[4096];
+	
+	switch(offset) {
+		case 0: { sprintf(buff, "label%llu", counter++);} break;
+		default: { sprintf(buff, "label%llu", counter + offset);} break;
+	}
+
+	return strdup(buff);
 }
 
 typedef struct { char **data; size_t len; } Vec;
@@ -142,6 +148,7 @@ rel_exp: exp REL exp {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("%s %s, %s, %s\n", $2, name, $1, $3);
+	$$ = name;
 }
 
 stmt: assignment {}
@@ -165,9 +172,26 @@ return_stmt: RETURN SEMICOLON {
 	printf("ret %s\n", $2);
 }
 
-when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { }
+when_stmt: WHEN L_PAREN add_exp R_PAREN {
+	char* name = genTempName();
+	char* endLabel = genLabelName(0);
+	char* elseLabel = genLabelName(0);
+	printf(". %s\n", name);
+	printf("! %s, %s\n", name, $3);
+	printf("?:= %s, %s\n", elseLabel, name);
+} LC stmts RC {
+	printf(":= %s\n", genLabelName(-2));
+} else_stmt {
+	printf(": %s\n", genLabelName(-2));
+}
+
+else_stmt: ELSE {
+	printf(": %s\n", genLabelName(-1));
+} LC stmts RC
+| {
+	printf(": %s\n", genLabelName(-1));
+	printf(":= %s\n", genLabelName(-2));
+}
 
 whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC
 { 
@@ -211,9 +235,7 @@ declaration: type IDENTIFIER SEMICOLON {
 }
 
 assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("= %s, %s\n", name, $3);
+	printf("= %s, %s\n", $1, $3);
 }
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
 	printf("[]= %s, %s, %s\n", $1, $3, $6);
