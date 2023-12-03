@@ -172,9 +172,26 @@ return_stmt: RETURN SEMICOLON {
 	printf("ret %s\n", $2);
 }
 
-when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { }
+when_stmt: WHEN L_PAREN add_exp R_PAREN {
+	char* name = genTempName();
+	char* endLabel = genLabelName(0);
+	char* elseLabel = genLabelName(0);
+	printf(". %s\n", name);
+	printf("! %s, %s\n", name, $3);
+	printf("?:= %s, %s\n", elseLabel, name);
+} LC stmts RC {
+	printf(":= %s\n", genLabelName(-2));
+} else_stmt {
+	printf(": %s\n", genLabelName(-2));
+}
+
+else_stmt: ELSE {
+	printf(": %s\n", genLabelName(-1));
+} LC stmts RC
+| {
+	printf(": %s\n", genLabelName(-1));
+	printf(":= %s\n", genLabelName(-2));
+}
 
 whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { }
 | WHILST L_PAREN add_exp R_PAREN LC RC { }
