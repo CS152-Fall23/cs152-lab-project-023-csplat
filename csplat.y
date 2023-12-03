@@ -60,9 +60,16 @@ void printSemanticError() {
 
 %union {
    char* identifier;
+   struct {
+	char* l1;
+   	char* l2;
+   	char* l3;
+   } control_flow;
 }
 
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_stmt 
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp 
+
+%type<control_flow> when_head whilst_stmt
 
 %%
 
@@ -172,24 +179,32 @@ return_stmt: RETURN SEMICOLON {
 	printf("ret %s\n", $2);
 }
 
-when_stmt: WHEN L_PAREN add_exp R_PAREN {
-	char* name = genTempName();
-	char* endLabel = genLabelName(0);
-	char* elseLabel = genLabelName(0);
-	printf(". %s\n", name);
-	printf("! %s, %s\n", name, $3);
-	printf("?:= %s, %s\n", elseLabel, name);
+when_stmt: when_head LC stmts RC {
+	printf(":= %s\n", $1.l1);
+} ELSE {
+	printf(": %s\n", $1.l2);
 } LC stmts RC {
-	printf(":= %s\n", genLabelName(-2));
-} else_stmt {
-	printf(": %s\n", genLabelName(-2));
+	printf(": %s\n", $1.l1);
+}
+| when_head LC stmts RC {
+	printf(": %s\n", $1.l2);
 }
 
+<<<<<<< HEAD
 else_stmt: ELSE {
 	printf(": %s\n", genLabelName(-1));
 } LC stmts RC{
 	printf(": %s\n", genLabelName(-1));
 	printf(":= %s\n", genLabelName(-2));
+=======
+when_head: WHEN L_PAREN add_exp R_PAREN {
+	char* name = genTempName();
+	$$.l1 = genLabelName(0);
+	$$.l2 = genLabelName(0);
+	printf(". %s\n", name);
+	printf("! %s, %s\n", name, $3);
+	printf("?:= %s, %s\n", $$.l2, name);
+>>>>>>> 413e04d5406dc0cbc3c7c3af63fadf8d3bb21c21
 }
 
 whilst_stmt: WHILST L_PAREN add_exp R_PAREN {
