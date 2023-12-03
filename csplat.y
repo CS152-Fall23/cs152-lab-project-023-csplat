@@ -187,7 +187,8 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN {
 
 else_stmt: ELSE {
 	printf(": %s\n", genLabelName(-1));
-} LC stmts RC{
+} LC stmts RC
+| {
 	printf(": %s\n", genLabelName(-1));
 	printf(":= %s\n", genLabelName(-2));
 }
