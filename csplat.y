@@ -148,6 +148,7 @@ rel_exp: exp REL exp {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("%s %s, %s, %s\n", $2, name, $1, $3);
+	$$ = name;
 }
 
 stmt: assignment {}
@@ -214,9 +215,7 @@ declaration: type IDENTIFIER SEMICOLON {
 }
 
 assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("= %s, %s\n", name, $3);
+	printf("= %s, %s\n", $1, $3);
 }
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
 	printf("[]= %s, %s, %s\n", $1, $3, $6);
