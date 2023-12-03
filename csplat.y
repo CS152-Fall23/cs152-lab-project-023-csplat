@@ -62,7 +62,7 @@ void printSemanticError() {
    char* identifier;
 }
 
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_stmt
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_stmt 
 
 %%
 
@@ -187,17 +187,23 @@ when_stmt: WHEN L_PAREN add_exp R_PAREN {
 
 else_stmt: ELSE {
 	printf(": %s\n", genLabelName(-1));
-} LC stmts RC
-| {
+} LC stmts RC{
 	printf(": %s\n", genLabelName(-1));
 	printf(":= %s\n", genLabelName(-2));
 }
 
-whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC
-{ 
-	printf("1231231\n");
+whilst_stmt: WHILST L_PAREN add_exp R_PAREN {
+	char* name = genTempName();
+	char* beginLabel = genLabelName(0);
+	char* endLabel = genLabelName(0);
+	printf(": %s\n", beginLabel);				//print lable name
+	printf(". %s\n", name);						//print temp for add_exp
+	printf("! %s, %s\n", name, $3);				//compare 
+	printf("?:= %s, %s\n", endLabel, name);		//if true goto endlabel
+} LC stmts RC {
+	printf("?:= %s\n", genLabelName(-2));		//goto beginlabel
+	printf(": %s\n", genLabelName(-1));			//endlabel
 }
-| WHILST L_PAREN add_exp R_PAREN LC RC { }
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }
 | DO LC RC WHILST exp { }

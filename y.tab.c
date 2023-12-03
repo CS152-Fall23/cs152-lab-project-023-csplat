@@ -84,10 +84,16 @@ static char* genTempName() {
 	return strdup(buff);
 }
 
-static char* genLabelName() {
-	static unsigned long long lbcounter;
-	static char lbbuff[4096]; sprintf(lbbuff, "label%llu", lbcounter++);
-	return strdup(lbbuff);
+static char* genLabelName(int offset) {
+	static unsigned long long counter;
+	static char buff[4096];
+	
+	switch(offset) {
+		case 0: { sprintf(buff, "label%llu", counter++);} break;
+		default: { sprintf(buff, "label%llu", counter + offset);} break;
+	}
+
+	return strdup(buff);
 }
 
 typedef struct { char **data; size_t len; } Vec;
@@ -115,7 +121,7 @@ void printSemanticError() {
 }
 
 
-#line 119 "y.tab.c"
+#line 125 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -195,11 +201,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 55 "csplat.y"
+#line 61 "csplat.y"
 
    char* identifier;
 
-#line 203 "y.tab.c"
+#line 209 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -262,16 +268,21 @@ enum yysymbol_kind_t
   YYSYMBOL_stmt = 40,                      /* stmt  */
   YYSYMBOL_return_stmt = 41,               /* return_stmt  */
   YYSYMBOL_when_stmt = 42,                 /* when_stmt  */
-  YYSYMBOL_whilst_stmt = 43,               /* whilst_stmt  */
-  YYSYMBOL_dowhilst_stmt = 44,             /* dowhilst_stmt  */
-  YYSYMBOL_function = 45,                  /* function  */
-  YYSYMBOL_46_3 = 46,                      /* $@3  */
-  YYSYMBOL_function_call = 47,             /* function_call  */
-  YYSYMBOL_param_type_list = 48,           /* param_type_list  */
-  YYSYMBOL_param_list = 49,                /* param_list  */
-  YYSYMBOL_type = 50,                      /* type  */
-  YYSYMBOL_declaration = 51,               /* declaration  */
-  YYSYMBOL_assignment = 52                 /* assignment  */
+  YYSYMBOL_43_3 = 43,                      /* $@3  */
+  YYSYMBOL_44_4 = 44,                      /* $@4  */
+  YYSYMBOL_else_stmt = 45,                 /* else_stmt  */
+  YYSYMBOL_46_5 = 46,                      /* $@5  */
+  YYSYMBOL_whilst_stmt = 47,               /* whilst_stmt  */
+  YYSYMBOL_48_6 = 48,                      /* $@6  */
+  YYSYMBOL_dowhilst_stmt = 49,             /* dowhilst_stmt  */
+  YYSYMBOL_function = 50,                  /* function  */
+  YYSYMBOL_51_7 = 51,                      /* $@7  */
+  YYSYMBOL_function_call = 52,             /* function_call  */
+  YYSYMBOL_param_type_list = 53,           /* param_type_list  */
+  YYSYMBOL_param_list = 54,                /* param_list  */
+  YYSYMBOL_type = 55,                      /* type  */
+  YYSYMBOL_declaration = 56,               /* declaration  */
+  YYSYMBOL_assignment = 57                 /* assignment  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -599,16 +610,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   207
+#define YYLAST   185
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  31
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  22
+#define YYNNTS  27
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  54
+#define YYNRULES  56
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  121
+#define YYNSTATES  124
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   285
@@ -660,12 +671,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    63,    63,    63,    63,    65,    66,    68,    71,    77,
-      84,    87,    93,   100,   106,   112,   115,   118,   121,   129,
-     141,   147,   148,   151,   154,   155,   156,   157,   158,   159,
-     161,   164,   168,   169,   170,   172,   176,   178,   179,   181,
-     181,   185,   187,   188,   189,   190,   192,   193,   194,   196,
-     197,   199,   203,   213,   218
+       0,    69,    69,    69,    69,    71,    72,    74,    77,    83,
+      90,    93,    99,   106,   112,   118,   121,   124,   127,   135,
+     147,   154,   155,   158,   161,   162,   163,   164,   165,   166,
+     168,   171,   175,   182,   175,   188,   188,   195,   195,   208,
+     209,   211,   211,   215,   217,   218,   219,   220,   222,   223,
+     224,   226,   227,   229,   233,   243,   246
 };
 #endif
 
@@ -687,15 +698,16 @@ yysymbol_name (yysymbol_kind_t yysymbol)
   "STOP", "READ", "WRITE", "VOID", "INT", "RETURN", "ASSIGN", "QM",
   "ESCAPE", "SEMICOLON", "COMMA", "ADD", "SUB", "MUL", "DIV", "REL",
   "$accept", "program", "$@1", "$@2", "stmts", "add_exp", "mul_exp", "exp",
-  "rel_exp", "stmt", "return_stmt", "when_stmt", "whilst_stmt",
-  "dowhilst_stmt", "function", "$@3", "function_call", "param_type_list",
-  "param_list", "type", "declaration", "assignment", YY_NULLPTR
+  "rel_exp", "stmt", "return_stmt", "when_stmt", "$@3", "$@4", "else_stmt",
+  "$@5", "whilst_stmt", "$@6", "dowhilst_stmt", "function", "$@7",
+  "function_call", "param_type_list", "param_list", "type", "declaration",
+  "assignment", YY_NULLPTR
   };
   return yy_sname[yysymbol];
 }
 #endif
 
-#define YYPACT_NINF (-85)
+#define YYPACT_NINF (-94)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -709,19 +721,19 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -85,    48,   187,   -85,    46,     6,    12,    43,    50,    60,
-     -85,   -85,    15,   187,   -85,   -85,   -85,   -85,   -85,   -85,
-      59,   -85,   -85,    11,    11,    11,    11,    58,    66,    69,
-     -85,     0,    11,   -85,    11,    55,    89,    38,   -85,   -85,
-     -85,   -85,     3,    25,    64,     2,    17,    67,    91,    78,
-      80,    11,    11,    20,   -85,   -85,    11,    11,    11,    11,
-      11,    95,    74,   -85,    82,   -85,    94,   113,    11,   110,
-     111,   116,    31,    88,   112,   -85,   -85,   -85,   -85,   -85,
-     -85,   123,   -85,   133,    11,   187,   108,    38,    11,   -85,
-     -85,   -85,   -85,   -85,   124,   127,    -1,    70,   125,   -85,
-     142,    38,   -85,   140,   143,    74,   -85,   139,   -85,   187,
-     129,   -85,    42,   159,    74,   187,   -85,   -85,   -85,   176,
-     -85
+     -94,    13,    49,   -94,   108,    12,    18,    23,    38,    54,
+     -94,   -94,    15,    49,   -94,   -94,   -94,   -94,   -94,   -94,
+      22,   -94,   -94,    11,    11,    11,    11,    67,    70,    73,
+     -94,     0,    11,   -94,    11,    89,    27,    40,   -94,   -94,
+     -94,   -94,    66,    25,   154,     2,    19,    76,    88,    85,
+      97,    11,    11,    21,   -94,   -94,    11,    11,    11,    11,
+      11,   109,    79,   -94,    58,   -94,   -94,   -94,    11,    98,
+     104,   111,    31,   120,    99,   -94,   -94,   -94,   -94,   -94,
+     -94,   121,   -94,   128,    11,   126,   131,    40,    11,   -94,
+     -94,   -94,   -94,   -94,   125,   130,    -1,   158,    49,    49,
+      40,   -94,   143,   146,    79,   -94,   106,   123,    49,   137,
+     -94,   -94,   -94,   140,    79,   151,   -94,   -94,   -94,   -94,
+     159,    49,   157,   -94
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -730,34 +742,34 @@ static const yytype_int16 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        2,     0,     0,     1,     0,     0,     0,     0,     0,     0,
-      49,    50,     0,     3,     6,    29,    25,    26,    27,    28,
+      51,    52,     0,     3,     6,    29,    25,    26,    27,    28,
        0,    24,    21,     0,     0,     0,     0,     0,     0,     0,
       13,    18,     0,    30,     0,     0,     7,    10,    16,    17,
        4,     5,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    48,     0,    14,    31,     0,     0,     0,     0,
-       0,     0,     0,    51,     0,    53,     0,     0,     0,     0,
-       0,     0,     0,    47,     0,    15,     8,     9,    11,    12,
-      20,     0,    39,     0,     0,     0,     0,    38,     0,    23,
-      22,    19,    46,    41,     0,     0,    44,     0,     0,    36,
-       0,    37,    52,     0,     0,     0,    54,    32,    35,     0,
-      45,    42,     0,     0,     0,     0,    34,    40,    43,     0,
-      33
+       0,     0,    50,     0,    14,    31,     0,     0,     0,     0,
+       0,     0,     0,    53,     0,    55,    32,    37,     0,     0,
+       0,     0,     0,    49,     0,    15,     8,     9,    11,    12,
+      20,     0,    41,     0,     0,     0,     0,    40,     0,    23,
+      22,    19,    48,    43,     0,     0,    46,     0,     0,     0,
+      39,    54,     0,     0,     0,    56,     0,     0,     0,    47,
+      44,    33,    38,     0,     0,     0,    42,    45,    35,    34,
+       0,     0,     0,    36
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -85,   -85,   -85,   -85,   -26,   -20,    72,   -27,   -85,   -13,
-     -85,    45,   -85,   -85,   -85,   -85,   -85,   -84,   -85,   -60,
-     -85,   -85
+     -94,   -94,   -94,   -94,   -26,   -20,    -9,   -27,   -94,   -13,
+     -94,   -94,   -94,   -94,   -94,   -94,   -94,   -94,   -94,   -94,
+     -94,   -94,   -93,   -94,   -60,   -94,   -94
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
        0,     1,     2,    40,    13,    35,    36,    37,    38,    14,
-      15,    16,    17,    18,    19,    95,    39,    82,    74,    20,
-      21,    22
+      15,    16,    85,   115,   119,   120,    17,    86,    18,    19,
+      95,    39,    82,    74,    20,    21,    22
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -765,52 +777,48 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      41,    48,    83,    43,    44,    45,    46,    54,    66,   104,
-      51,    25,    53,    61,    30,    31,    32,    26,    30,    31,
-      32,   111,    52,    67,   105,    62,    75,    63,    56,    57,
-     118,    72,    73,    80,    64,    41,    76,    77,    34,    33,
-      91,    87,    34,    56,    57,    83,    56,    57,     3,   115,
-      27,    56,    57,     5,    83,    28,    23,    56,    57,    98,
-     100,   101,     4,    42,    97,    29,    47,    24,    60,     5,
-      49,     6,     7,    50,     8,     9,    10,    11,    12,    55,
-      68,    56,    57,   113,    70,    41,    71,    41,    65,   119,
-      56,    57,    10,    11,   106,     4,    56,    57,    81,    69,
-      41,    85,     5,    84,     6,     7,    41,     8,     9,    10,
-      11,    12,     4,    92,    56,    57,    99,    58,    59,     5,
-      86,     6,     7,    88,     8,     9,    10,    11,    12,     4,
-      78,    79,    94,   107,    93,    89,     5,    96,     6,     7,
-      90,     8,     9,    10,    11,    12,     4,   109,   102,   103,
-     108,   112,   110,     5,   114,     6,     7,   116,     8,     9,
-      10,    11,    12,     4,     0,     0,     0,   117,     0,     0,
-       5,     0,     6,     7,     0,     8,     9,    10,    11,    12,
-       4,     0,     0,     0,   120,     0,     0,     5,     0,     6,
-       7,     4,     8,     9,    10,    11,    12,     0,     5,     0,
-       6,     7,     0,     8,     9,    10,    11,    12
+      41,    48,    83,    43,    44,    45,    46,    54,    66,   103,
+      51,   110,    53,     3,    30,    31,    32,    25,    30,    31,
+      32,   117,    52,    26,   104,    67,    42,    75,    56,    57,
+      27,    72,    73,    80,    64,    41,    76,    77,    34,    33,
+      91,    87,    34,    28,    83,    56,    57,    56,    57,    78,
+      79,    56,    57,     4,    83,    58,    59,    56,    57,    29,
+       5,   100,     6,     7,    97,     8,     9,    10,    11,    12,
+      60,     4,   106,   107,    49,    47,    61,    50,     5,    84,
+       6,     7,   113,     8,     9,    10,    11,    12,    62,    68,
+      63,    70,     4,    41,    41,   122,    69,    10,    11,     5,
+      41,     6,     7,    71,     8,     9,    10,    11,    12,    41,
+       4,    88,    81,    55,   111,    56,    57,     5,    23,     6,
+       7,    93,     8,     9,    10,    11,    12,     4,    89,    24,
+      94,   112,    96,    98,     5,    90,     6,     7,    99,     8,
+       9,    10,    11,    12,     4,    92,    56,    57,   116,   101,
+     108,     5,   102,     6,     7,   109,     8,     9,    10,    11,
+      12,     4,   114,   118,     0,   123,   121,     0,     5,     0,
+       6,     7,     0,     8,     9,    10,    11,    12,    65,     0,
+      56,    57,   105,     0,    56,    57
 };
 
 static const yytype_int8 yycheck[] =
 {
       13,    27,    62,    23,    24,    25,    26,    34,     6,    10,
-      10,     5,    32,    10,     3,     4,     5,     5,     3,     4,
-       5,   105,    22,     6,    25,    22,     6,    24,    26,    27,
-     114,    51,    52,    60,     9,    48,    56,    57,    27,    24,
-       9,    68,    27,    26,    27,   105,    26,    27,     0,     7,
-       7,    26,    27,    11,   114,     5,    10,    26,    27,    85,
-      86,    88,     4,     4,    84,     5,     8,    21,    30,    11,
-       4,    13,    14,     4,    16,    17,    18,    19,    20,    24,
-      13,    26,    27,   109,     6,    98,     6,   100,    24,   115,
-      26,    27,    18,    19,    24,     4,    26,    27,     3,     8,
-     113,     7,    11,    21,    13,    14,   119,    16,    17,    18,
-      19,    20,     4,    25,    26,    27,     8,    28,    29,    11,
-       7,    13,    14,    13,    16,    17,    18,    19,    20,     4,
-      58,    59,     9,     8,    22,    24,    11,     4,    13,    14,
-      24,    16,    17,    18,    19,    20,     4,     7,    24,    22,
-       8,    12,     9,    11,    25,    13,    14,   112,    16,    17,
-      18,    19,    20,     4,    -1,    -1,    -1,     8,    -1,    -1,
-      11,    -1,    13,    14,    -1,    16,    17,    18,    19,    20,
-       4,    -1,    -1,    -1,     8,    -1,    -1,    11,    -1,    13,
-      14,     4,    16,    17,    18,    19,    20,    -1,    11,    -1,
-      13,    14,    -1,    16,    17,    18,    19,    20
+      10,   104,    32,     0,     3,     4,     5,     5,     3,     4,
+       5,   114,    22,     5,    25,     6,     4,     6,    26,    27,
+       7,    51,    52,    60,     9,    48,    56,    57,    27,    24,
+       9,    68,    27,     5,   104,    26,    27,    26,    27,    58,
+      59,    26,    27,     4,   114,    28,    29,    26,    27,     5,
+      11,    88,    13,    14,    84,    16,    17,    18,    19,    20,
+      30,     4,    98,    99,     4,     8,    10,     4,    11,    21,
+      13,    14,   108,    16,    17,    18,    19,    20,    22,    13,
+      24,     6,     4,   106,   107,   121,     8,    18,    19,    11,
+     113,    13,    14,     6,    16,    17,    18,    19,    20,   122,
+       4,    13,     3,    24,     8,    26,    27,    11,    10,    13,
+      14,    22,    16,    17,    18,    19,    20,     4,    24,    21,
+       9,     8,     4,     7,    11,    24,    13,    14,     7,    16,
+      17,    18,    19,    20,     4,    25,    26,    27,     8,    24,
+       7,    11,    22,    13,    14,     9,    16,    17,    18,    19,
+      20,     4,    25,    12,    -1,     8,     7,    -1,    11,    -1,
+      13,    14,    -1,    16,    17,    18,    19,    20,    24,    -1,
+      26,    27,    24,    -1,    26,    27
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -818,18 +826,18 @@ static const yytype_int8 yycheck[] =
 static const yytype_int8 yystos[] =
 {
        0,    32,    33,     0,     4,    11,    13,    14,    16,    17,
-      18,    19,    20,    35,    40,    41,    42,    43,    44,    45,
-      50,    51,    52,    10,    21,     5,     5,     7,     5,     5,
-       3,     4,     5,    24,    27,    36,    37,    38,    39,    47,
+      18,    19,    20,    35,    40,    41,    42,    47,    49,    50,
+      55,    56,    57,    10,    21,     5,     5,     7,     5,     5,
+       3,     4,     5,    24,    27,    36,    37,    38,    39,    52,
       34,    40,     4,    36,    36,    36,    36,     8,    35,     4,
        4,    10,    22,    36,    38,    24,    26,    27,    28,    29,
       30,    10,    22,    24,     9,    24,     6,     6,    13,     8,
-       6,     6,    36,    36,    49,     6,    36,    36,    37,    37,
-      38,     3,    48,    50,    21,     7,     7,    38,    13,    24,
-      24,     9,    25,    22,     9,    46,     4,    36,    35,     8,
-      35,    38,    24,    22,    10,    25,    24,     8,     8,     7,
-       9,    48,    12,    35,    25,     7,    42,     8,    48,    35,
-       8
+       6,     6,    36,    36,    54,     6,    36,    36,    37,    37,
+      38,     3,    53,    55,    21,    43,    48,    38,    13,    24,
+      24,     9,    25,    22,     9,    51,     4,    36,     7,     7,
+      38,    24,    22,    10,    25,    24,    35,    35,     7,     9,
+      53,     8,     8,    35,    25,    44,     8,    53,    12,    45,
+      46,     7,    35,     8
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -838,9 +846,9 @@ static const yytype_int8 yyr1[] =
        0,    31,    33,    34,    32,    35,    35,    36,    36,    36,
       37,    37,    37,    38,    38,    38,    38,    38,    38,    38,
       39,    40,    40,    40,    40,    40,    40,    40,    40,    40,
-      41,    41,    42,    42,    42,    43,    43,    44,    44,    46,
-      45,    47,    48,    48,    48,    48,    49,    49,    49,    50,
-      50,    51,    51,    52,    52
+      41,    41,    43,    44,    42,    46,    45,    48,    47,    49,
+      49,    51,    50,    52,    53,    53,    53,    53,    54,    54,
+      54,    55,    55,    56,    56,    57,    57
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -849,9 +857,9 @@ static const yytype_int8 yyr2[] =
        0,     2,     0,     0,     3,     2,     1,     1,     3,     3,
        1,     3,     3,     1,     2,     3,     1,     1,     1,     4,
        3,     1,     5,     5,     1,     1,     1,     1,     1,     1,
-       2,     3,     7,    11,     9,     7,     6,     6,     5,     0,
-       9,     4,     4,     6,     2,     4,     2,     1,     0,     1,
-       1,     3,     6,     4,     7
+       2,     3,     0,     0,    10,     0,     5,     0,     8,     6,
+       5,     0,     9,     4,     4,     6,     2,     4,     2,     1,
+       0,     1,     1,     3,     6,     4,     7
 };
 
 
@@ -1377,143 +1385,143 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 63 "csplat.y"
+#line 69 "csplat.y"
          { printf("func main\n"); }
-#line 1383 "y.tab.c"
+#line 1391 "y.tab.c"
     break;
 
   case 3: /* $@2: %empty  */
-#line 63 "csplat.y"
+#line 69 "csplat.y"
                                           { printf("endfunc\n"); }
-#line 1389 "y.tab.c"
+#line 1397 "y.tab.c"
     break;
 
   case 4: /* program: $@1 stmts $@2  */
-#line 63 "csplat.y"
+#line 69 "csplat.y"
                                                                    {}
-#line 1395 "y.tab.c"
+#line 1403 "y.tab.c"
     break;
 
   case 5: /* stmts: stmts stmt  */
-#line 65 "csplat.y"
+#line 71 "csplat.y"
                   {}
-#line 1401 "y.tab.c"
+#line 1409 "y.tab.c"
     break;
 
   case 6: /* stmts: stmt  */
-#line 66 "csplat.y"
+#line 72 "csplat.y"
       {}
-#line 1407 "y.tab.c"
-    break;
-
-  case 7: /* add_exp: mul_exp  */
-#line 68 "csplat.y"
-                 {
-	(yyval.identifier) = (yyvsp[0].identifier);
-}
 #line 1415 "y.tab.c"
     break;
 
+  case 7: /* add_exp: mul_exp  */
+#line 74 "csplat.y"
+                 {
+	(yyval.identifier) = (yyvsp[0].identifier);
+}
+#line 1423 "y.tab.c"
+    break;
+
   case 8: /* add_exp: add_exp ADD add_exp  */
-#line 71 "csplat.y"
+#line 77 "csplat.y"
                       {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("+ %s, %s, %s\n", name, (yyvsp[-2].identifier), (yyvsp[0].identifier));
 	(yyval.identifier) = name;
 }
-#line 1426 "y.tab.c"
+#line 1434 "y.tab.c"
     break;
 
   case 9: /* add_exp: add_exp SUB add_exp  */
-#line 77 "csplat.y"
+#line 83 "csplat.y"
                       {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("- %s, %s, %s\n", name, (yyvsp[-2].identifier), (yyvsp[0].identifier));
 	(yyval.identifier) = name;
 }
-#line 1437 "y.tab.c"
-    break;
-
-  case 10: /* mul_exp: exp  */
-#line 84 "csplat.y"
-             {
-	(yyval.identifier) = (yyvsp[0].identifier);
-}
 #line 1445 "y.tab.c"
     break;
 
+  case 10: /* mul_exp: exp  */
+#line 90 "csplat.y"
+             {
+	(yyval.identifier) = (yyvsp[0].identifier);
+}
+#line 1453 "y.tab.c"
+    break;
+
   case 11: /* mul_exp: mul_exp MUL mul_exp  */
-#line 87 "csplat.y"
+#line 93 "csplat.y"
                       {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("* %s, %s, %s\n", name, (yyvsp[-2].identifier), (yyvsp[0].identifier));
 	(yyval.identifier) = name;
 }
-#line 1456 "y.tab.c"
+#line 1464 "y.tab.c"
     break;
 
   case 12: /* mul_exp: mul_exp DIV mul_exp  */
-#line 93 "csplat.y"
+#line 99 "csplat.y"
                       {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("/ %s, %s, %s\n", name, (yyvsp[-2].identifier), (yyvsp[0].identifier));
 	(yyval.identifier) = name;
 }
-#line 1467 "y.tab.c"
+#line 1475 "y.tab.c"
     break;
 
   case 13: /* exp: NUM  */
-#line 100 "csplat.y"
+#line 106 "csplat.y"
          {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("= %s, %s\n", name, (yyvsp[0].identifier));
 	(yyval.identifier) = (yyvsp[0].identifier);
 }
-#line 1478 "y.tab.c"
+#line 1486 "y.tab.c"
     break;
 
   case 14: /* exp: SUB exp  */
-#line 106 "csplat.y"
+#line 112 "csplat.y"
           {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("- %s, 0, %s\n", name, (yyvsp[0].identifier));
 	(yyval.identifier) = name;
 }
-#line 1489 "y.tab.c"
-    break;
-
-  case 15: /* exp: L_PAREN add_exp R_PAREN  */
-#line 112 "csplat.y"
-                          {
-	(yyval.identifier) = (yyvsp[-1].identifier);
-}
 #line 1497 "y.tab.c"
     break;
 
-  case 16: /* exp: rel_exp  */
-#line 115 "csplat.y"
-          {
-	(yyval.identifier) = (yyvsp[0].identifier);
+  case 15: /* exp: L_PAREN add_exp R_PAREN  */
+#line 118 "csplat.y"
+                          {
+	(yyval.identifier) = (yyvsp[-1].identifier);
 }
 #line 1505 "y.tab.c"
     break;
 
-  case 17: /* exp: function_call  */
-#line 118 "csplat.y"
-                {
+  case 16: /* exp: rel_exp  */
+#line 121 "csplat.y"
+          {
 	(yyval.identifier) = (yyvsp[0].identifier);
 }
 #line 1513 "y.tab.c"
     break;
 
+  case 17: /* exp: function_call  */
+#line 124 "csplat.y"
+                {
+	(yyval.identifier) = (yyvsp[0].identifier);
+}
+#line 1521 "y.tab.c"
+    break;
+
   case 18: /* exp: IDENTIFIER  */
-#line 121 "csplat.y"
+#line 127 "csplat.y"
              {
 	if (!variableExists((yyvsp[0].identifier))) {
 		printSemanticError();
@@ -1522,11 +1530,11 @@ yyreduce:
 	}
 	(yyval.identifier) = (yyvsp[0].identifier);
 }
-#line 1526 "y.tab.c"
+#line 1534 "y.tab.c"
     break;
 
   case 19: /* exp: IDENTIFIER LB add_exp RB  */
-#line 129 "csplat.y"
+#line 135 "csplat.y"
                            {
 	if (!variableExists((yyvsp[-3].identifier))) {
 		printSemanticError();
@@ -1538,222 +1546,260 @@ yyreduce:
 	printf("=[] %s, %s, %s\n", name, (yyvsp[-3].identifier), (yyvsp[-1].identifier));
 	(yyval.identifier) = name;
 }
-#line 1542 "y.tab.c"
+#line 1550 "y.tab.c"
     break;
 
   case 20: /* rel_exp: exp REL exp  */
-#line 141 "csplat.y"
+#line 147 "csplat.y"
                      {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("%s %s, %s, %s\n", (yyvsp[-1].identifier), name, (yyvsp[-2].identifier), (yyvsp[0].identifier));
+	(yyval.identifier) = name;
 }
-#line 1552 "y.tab.c"
+#line 1561 "y.tab.c"
     break;
 
   case 21: /* stmt: assignment  */
-#line 147 "csplat.y"
+#line 154 "csplat.y"
                  {}
-#line 1558 "y.tab.c"
+#line 1567 "y.tab.c"
     break;
 
   case 22: /* stmt: WRITE L_PAREN IDENTIFIER R_PAREN SEMICOLON  */
-#line 148 "csplat.y"
+#line 155 "csplat.y"
                                              {
 	printf(".> %s\n", (yyvsp[-2].identifier));
 }
-#line 1566 "y.tab.c"
+#line 1575 "y.tab.c"
     break;
 
   case 23: /* stmt: READ L_PAREN IDENTIFIER R_PAREN SEMICOLON  */
-#line 151 "csplat.y"
+#line 158 "csplat.y"
                                             {
 	printf(".< %s\n", (yyvsp[-2].identifier));
 }
-#line 1574 "y.tab.c"
+#line 1583 "y.tab.c"
     break;
 
   case 24: /* stmt: declaration  */
-#line 154 "csplat.y"
+#line 161 "csplat.y"
               {}
-#line 1580 "y.tab.c"
+#line 1589 "y.tab.c"
     break;
 
   case 25: /* stmt: when_stmt  */
-#line 155 "csplat.y"
+#line 162 "csplat.y"
             {}
-#line 1586 "y.tab.c"
+#line 1595 "y.tab.c"
     break;
 
   case 26: /* stmt: whilst_stmt  */
-#line 156 "csplat.y"
+#line 163 "csplat.y"
               {}
-#line 1592 "y.tab.c"
+#line 1601 "y.tab.c"
     break;
 
   case 27: /* stmt: dowhilst_stmt  */
-#line 157 "csplat.y"
+#line 164 "csplat.y"
                 {}
-#line 1598 "y.tab.c"
+#line 1607 "y.tab.c"
     break;
 
   case 28: /* stmt: function  */
-#line 158 "csplat.y"
+#line 165 "csplat.y"
            {}
-#line 1604 "y.tab.c"
+#line 1613 "y.tab.c"
     break;
 
   case 29: /* stmt: return_stmt  */
-#line 159 "csplat.y"
+#line 166 "csplat.y"
               {}
-#line 1610 "y.tab.c"
+#line 1619 "y.tab.c"
     break;
 
   case 30: /* return_stmt: RETURN SEMICOLON  */
-#line 161 "csplat.y"
+#line 168 "csplat.y"
                               {
 	printf("ret 0\n");
 }
-#line 1618 "y.tab.c"
+#line 1627 "y.tab.c"
     break;
 
   case 31: /* return_stmt: RETURN add_exp SEMICOLON  */
-#line 164 "csplat.y"
+#line 171 "csplat.y"
                            {
 	printf("ret %s\n", (yyvsp[-1].identifier));
 }
-#line 1626 "y.tab.c"
+#line 1635 "y.tab.c"
     break;
 
-  case 32: /* when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC  */
-#line 168 "csplat.y"
-                                                    { }
-#line 1632 "y.tab.c"
-    break;
-
-  case 33: /* when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC  */
-#line 169 "csplat.y"
-                                                            { }
-#line 1638 "y.tab.c"
-    break;
-
-  case 34: /* when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt  */
-#line 170 "csplat.y"
-                                                          { }
-#line 1644 "y.tab.c"
-    break;
-
-  case 35: /* whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC  */
-#line 173 "csplat.y"
-{ 
-	printf("1231231\n");
+  case 32: /* $@3: %empty  */
+#line 175 "csplat.y"
+                                        {
+	char* name = genTempName();
+	char* endLabel = genLabelName(0);
+	char* elseLabel = genLabelName(0);
+	printf(". %s\n", name);
+	printf("! %s, %s\n", name, (yyvsp[-1].identifier));
+	printf("?:= %s, %s\n", elseLabel, name);
 }
-#line 1652 "y.tab.c"
+#line 1648 "y.tab.c"
     break;
 
-  case 36: /* whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC RC  */
-#line 176 "csplat.y"
-                                       { }
-#line 1658 "y.tab.c"
+  case 33: /* $@4: %empty  */
+#line 182 "csplat.y"
+              {
+	printf(":= %s\n", genLabelName(-2));
+}
+#line 1656 "y.tab.c"
     break;
 
-  case 37: /* dowhilst_stmt: DO LC stmts RC WHILST exp  */
-#line 178 "csplat.y"
-                                         { }
+  case 34: /* when_stmt: WHEN L_PAREN add_exp R_PAREN $@3 LC stmts RC $@4 else_stmt  */
+#line 184 "csplat.y"
+            {
+	printf(": %s\n", genLabelName(-2));
+}
 #line 1664 "y.tab.c"
     break;
 
-  case 38: /* dowhilst_stmt: DO LC RC WHILST exp  */
-#line 179 "csplat.y"
+  case 35: /* $@5: %empty  */
+#line 188 "csplat.y"
+                {
+	printf(": %s\n", genLabelName(-1));
+}
+#line 1672 "y.tab.c"
+    break;
+
+  case 36: /* else_stmt: ELSE $@5 LC stmts RC  */
+#line 190 "csplat.y"
+             {
+	printf(": %s\n", genLabelName(-1));
+	printf(":= %s\n", genLabelName(-2));
+}
+#line 1681 "y.tab.c"
+    break;
+
+  case 37: /* $@6: %empty  */
+#line 195 "csplat.y"
+                                            {
+	char* name = genTempName();
+	char* beginLabel = genLabelName(0);
+	char* endLabel = genLabelName(0);
+	printf(": %s\n", beginLabel);				//print lable name
+	printf(". %s\n", name);						//print temp for add_exp
+	printf("! %s, %s\n", name, (yyvsp[-1].identifier));				//compare 
+	printf("?:= %s, %s\n", endLabel, name);		//if true goto endlabel
+}
+#line 1695 "y.tab.c"
+    break;
+
+  case 38: /* whilst_stmt: WHILST L_PAREN add_exp R_PAREN $@6 LC stmts RC  */
+#line 203 "csplat.y"
+              {
+	printf("?:= %s\n", genLabelName(-2));		//goto beginlabel
+	printf(": %s\n", genLabelName(-1));			//endlabel
+}
+#line 1704 "y.tab.c"
+    break;
+
+  case 39: /* dowhilst_stmt: DO LC stmts RC WHILST exp  */
+#line 208 "csplat.y"
+                                         { }
+#line 1710 "y.tab.c"
+    break;
+
+  case 40: /* dowhilst_stmt: DO LC RC WHILST exp  */
+#line 209 "csplat.y"
                       { }
-#line 1670 "y.tab.c"
+#line 1716 "y.tab.c"
     break;
 
-  case 39: /* $@3: %empty  */
-#line 181 "csplat.y"
+  case 41: /* $@7: %empty  */
+#line 211 "csplat.y"
                                              { printf("func %s\n", (yyvsp[-2].identifier)); }
-#line 1676 "y.tab.c"
+#line 1722 "y.tab.c"
     break;
 
-  case 40: /* function: type IDENTIFIER QM param_type_list $@3 QM LC stmts RC  */
-#line 181 "csplat.y"
+  case 42: /* function: type IDENTIFIER QM param_type_list $@7 QM LC stmts RC  */
+#line 211 "csplat.y"
                                                                                          {
 	printf("endfunc\n");
 }
-#line 1684 "y.tab.c"
+#line 1730 "y.tab.c"
     break;
 
-  case 41: /* function_call: IDENTIFIER QM param_list QM  */
-#line 185 "csplat.y"
+  case 43: /* function_call: IDENTIFIER QM param_list QM  */
+#line 215 "csplat.y"
                                            {}
-#line 1690 "y.tab.c"
+#line 1736 "y.tab.c"
     break;
 
-  case 42: /* param_type_list: type IDENTIFIER COMMA param_type_list  */
-#line 187 "csplat.y"
+  case 44: /* param_type_list: type IDENTIFIER COMMA param_type_list  */
+#line 217 "csplat.y"
                                                        {}
-#line 1696 "y.tab.c"
+#line 1742 "y.tab.c"
     break;
 
-  case 43: /* param_type_list: type IDENTIFIER LB RB COMMA param_type_list  */
-#line 188 "csplat.y"
+  case 45: /* param_type_list: type IDENTIFIER LB RB COMMA param_type_list  */
+#line 218 "csplat.y"
                                               {}
-#line 1702 "y.tab.c"
+#line 1748 "y.tab.c"
     break;
 
-  case 44: /* param_type_list: type IDENTIFIER  */
-#line 189 "csplat.y"
+  case 46: /* param_type_list: type IDENTIFIER  */
+#line 219 "csplat.y"
                   {}
-#line 1708 "y.tab.c"
+#line 1754 "y.tab.c"
     break;
 
-  case 45: /* param_type_list: type IDENTIFIER LB RB  */
-#line 190 "csplat.y"
+  case 47: /* param_type_list: type IDENTIFIER LB RB  */
+#line 220 "csplat.y"
                         {}
-#line 1714 "y.tab.c"
+#line 1760 "y.tab.c"
     break;
 
-  case 46: /* param_list: add_exp COMMA  */
-#line 192 "csplat.y"
+  case 48: /* param_list: add_exp COMMA  */
+#line 222 "csplat.y"
                           {}
-#line 1720 "y.tab.c"
+#line 1766 "y.tab.c"
     break;
 
-  case 47: /* param_list: add_exp  */
-#line 193 "csplat.y"
+  case 49: /* param_list: add_exp  */
+#line 223 "csplat.y"
           {}
-#line 1726 "y.tab.c"
+#line 1772 "y.tab.c"
     break;
 
-  case 48: /* param_list: %empty  */
-#line 194 "csplat.y"
+  case 50: /* param_list: %empty  */
+#line 224 "csplat.y"
   {}
-#line 1732 "y.tab.c"
+#line 1778 "y.tab.c"
     break;
 
-  case 49: /* type: VOID  */
-#line 196 "csplat.y"
+  case 51: /* type: VOID  */
+#line 226 "csplat.y"
            {}
-#line 1738 "y.tab.c"
+#line 1784 "y.tab.c"
     break;
 
-  case 50: /* type: INT  */
-#line 197 "csplat.y"
+  case 52: /* type: INT  */
+#line 227 "csplat.y"
       {}
-#line 1744 "y.tab.c"
+#line 1790 "y.tab.c"
     break;
 
-  case 51: /* declaration: type IDENTIFIER SEMICOLON  */
-#line 199 "csplat.y"
+  case 53: /* declaration: type IDENTIFIER SEMICOLON  */
+#line 229 "csplat.y"
                                        {
 	VecPush(&vec, (yyvsp[-1].identifier));
 	printf(". %s\n", (yyvsp[-1].identifier));
 }
-#line 1753 "y.tab.c"
+#line 1799 "y.tab.c"
     break;
 
-  case 52: /* declaration: type IDENTIFIER LB NUM RB SEMICOLON  */
-#line 203 "csplat.y"
+  case 54: /* declaration: type IDENTIFIER LB NUM RB SEMICOLON  */
+#line 233 "csplat.y"
                                       {
 	VecPush(&vec, (yyvsp[-4].identifier));
 	if (atoi((yyvsp[-2].identifier)) <= 0) {
@@ -1763,29 +1809,27 @@ yyreduce:
 	}
 	printf(".[] %s, %s\n", (yyvsp[-4].identifier), (yyvsp[-2].identifier));
 }
-#line 1767 "y.tab.c"
+#line 1813 "y.tab.c"
     break;
 
-  case 53: /* assignment: IDENTIFIER ASSIGN add_exp SEMICOLON  */
-#line 213 "csplat.y"
+  case 55: /* assignment: IDENTIFIER ASSIGN add_exp SEMICOLON  */
+#line 243 "csplat.y"
                                                 {
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("= %s, %s\n", name, (yyvsp[-1].identifier));
+	printf("= %s, %s\n", (yyvsp[-3].identifier), (yyvsp[-1].identifier));
 }
-#line 1777 "y.tab.c"
+#line 1821 "y.tab.c"
     break;
 
-  case 54: /* assignment: IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON  */
-#line 218 "csplat.y"
+  case 56: /* assignment: IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON  */
+#line 246 "csplat.y"
                                                     {
 	printf("[]= %s, %s, %s\n", (yyvsp[-6].identifier), (yyvsp[-4].identifier), (yyvsp[-1].identifier));
 }
-#line 1785 "y.tab.c"
+#line 1829 "y.tab.c"
     break;
 
 
-#line 1789 "y.tab.c"
+#line 1833 "y.tab.c"
 
       default: break;
     }
@@ -1983,7 +2027,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 222 "csplat.y"
+#line 250 "csplat.y"
 
 
 static int yyreport_syntax_error(const yypcontext_t *ctx) {

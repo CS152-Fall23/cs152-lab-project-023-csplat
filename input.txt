@@ -1,5 +1,7 @@
 void bubbleSort ?int arr[], int n?
 {
+    int n;
+    int arr[10];
     int i;
     int j;
     int temp;
@@ -11,9 +13,9 @@ void bubbleSort ?int arr[], int n?
 		j := i + 1;
         whilst (j < n - 1) {
             when (arr[j] > arr[j + 1]) {
-                temp := a[i];
-                a[i] := a[j];
-                a[j] := temp;
+                temp := arr[i];
+                arr[i] := arr[j];
+                arr[j] := temp;
             }
             j := j + 1;
         }
