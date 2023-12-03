@@ -1,8 +1,0 @@
-./input.txt
-./output.txt
-./mil_run
-./parser.elf
-./y.tab.c
-./y.tab.h
-./y.output
-./.gitignore
