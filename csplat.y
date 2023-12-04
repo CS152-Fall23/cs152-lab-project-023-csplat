@@ -13,7 +13,7 @@ static char* genTempName() {
 	static char buff[4096]; sprintf(buff, "temp%llu", counter++);
 	return strdup(buff);
 }
-
+ 
 typedef struct { char **data; size_t len; } Vec;
 typedef struct { int *data; size_t len; } VecInt;
 
