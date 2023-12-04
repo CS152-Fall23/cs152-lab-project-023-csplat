@@ -379,9 +379,7 @@ assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
 		fprintf(stderr, "Usage of array '%s', missing index value.\n", $1);
 		exit(-1);
 	}
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("= %s, %s\n", name, $3);
+	printf("= %s, %s\n", $1, $3);
 }
 
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
