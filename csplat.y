@@ -13,7 +13,19 @@ static char* genTempName() {
 	static char buff[4096]; sprintf(buff, "temp%llu", counter++);
 	return strdup(buff);
 }
- 
+
+static char* genLabelName(int offset) {
+	static unsigned long long counter;
+	static char buff[4096];
+	
+	switch(offset) {
+		case 0: { sprintf(buff, "label%llu", counter++);} break;
+		default: { sprintf(buff, "label%llu", counter + offset);} break;
+	}
+
+	return strdup(buff);
+}
+
 typedef struct { char **data; size_t len; } Vec;
 typedef struct { int *data; size_t len; } VecInt;
 
@@ -94,9 +106,16 @@ void printSemanticError() {
 
 %union {
    char* identifier;
+   struct {
+	char* l1;
+   	char* l2;
+   	char* l3;
+   } control_flow;
 }
 
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp 
+
+%type<control_flow> when_head whilst_stmt whilst_head whilst_body
 
 %%
 
@@ -199,6 +218,7 @@ rel_exp: exp REL exp {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("%s %s, %s, %s\n", $2, name, $1, $3);
+	$$ = name;
 }
 
 stmt: assignment {}
@@ -222,12 +242,43 @@ return_stmt: RETURN SEMICOLON {
 	printf("ret %s\n", $2);
 }
 
-when_stmt: WHEN L_PAREN add_exp R_PAREN LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE LC stmts RC { }
-| WHEN L_PAREN add_exp R_PAREN LC stmts RC ELSE when_stmt { }
+when_stmt: when_head LC stmts RC {
+	printf(":= %s\n", $1.l1);
+} ELSE {
+	printf(": %s\n", $1.l2);
+} LC stmts RC {
+	printf(": %s\n", $1.l1);
+}
+| when_head LC stmts RC {
+	printf(": %s\n", $1.l2);
+}
 
-whilst_stmt: WHILST L_PAREN add_exp R_PAREN LC stmts RC { }
-| WHILST L_PAREN add_exp R_PAREN LC RC { }
+when_head: WHEN L_PAREN add_exp R_PAREN {
+	char* name = genTempName();
+	$$.l1 = genLabelName(0);
+	$$.l2 = genLabelName(0);
+	printf(". %s\n", name);
+	printf("! %s, %s\n", name, $3);
+	printf("?:= %s, %s\n", $$.l2, name);
+}
+	
+whilst_stmt: whilst_head whilst_body LC stmts RC{
+	printf("?:= %s\n", $1.l1);					//goto beginlabel
+	printf(": %s\n", $2.l1);					//print endlabel
+}
+
+whilst_head: WHILST{
+	$$.l1 = genLabelName(0);					//beginLabel
+	printf(": %s\n", $$.l1);					//print begin lable name
+}
+
+whilst_body: L_PAREN add_exp R_PAREN{
+	char* name = genTempName();
+	$$.l1 = genLabelName(0);					//endlabel
+	printf(". %s\n", name);						//print temp for add_exp
+	printf("! %s, %s\n", name, $2);				//compare 
+	printf("?:= %s, %s\n", $$.l1, name);		//if true goto endlabel
+}
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }
 | DO LC RC WHILST exp { }
@@ -294,6 +345,7 @@ assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
 	printf(". %s\n", name);
 	printf("= %s, %s\n", name, $3);
 }
+
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
 	if (!arrayExists($1)) {
 		printSemanticError();
