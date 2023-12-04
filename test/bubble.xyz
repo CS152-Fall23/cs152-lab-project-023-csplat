@@ -1,11 +1,13 @@
 void bubbleSort ??
 {
-    int arr[3];
+    int arr[5];
     arr[0] := 5;
     arr[1] := 4;
     arr[2] := 3;
+    arr[3] := 96;
+    arr[4] := 45;
     int n;
-    n := 3;
+    n := 5;
 
     int i;
     int j;
@@ -15,12 +17,12 @@ void bubbleSort ??
     temp := 0;
     
     whilst (i < (n - 1)) {
-		j := i + 1;
-        whilst (j < (n - 2)) {
+		j := 0;
+        whilst (j < (n - 1)) {
             when (arr[j] > arr[(j + 1)]) {
-                temp := arr[i];
-                arr[i] := arr[j];
-                arr[j] := temp;
+                temp := arr[j];
+                arr[j] := arr[j + 1];
+                arr[j + 1] := temp;
             }
             j := j + 1;
         }
@@ -28,12 +30,18 @@ void bubbleSort ??
     }
 
     #Print result
+    int v;
+    v := arr[0];
+    int w;
+    w := arr[1];
     int x;
-    x := arr[0];
+    x := arr[2];
     int y;
-    y := arr[1];
+    y := arr[3];
     int z;
-    z := arr[2];
+    z := arr[4];
+    write(v);
+    write(w);
     write(x);
     write(y);
     write(z);
