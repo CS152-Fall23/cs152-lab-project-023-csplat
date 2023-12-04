@@ -65,22 +65,15 @@ void printSemanticError() {
    	char* l2;
    	char* l3;
    } control_flow;
-   int paramCount;
 }
 
-<<<<<<< HEAD
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_head
-=======
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp
->>>>>>> 4abc456d90ff13bb71027874ccfe7c331fb237c5
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp 
 
-%type<control_flow> when_head whilst_stmt  
-
-%type<paramCount> param_type_list
+%type<control_flow> when_head whilst_stmt whilst_head whilst_body
 
 %%
 
-program: stmts {}
+program: { printf("func main\n"); } stmts { printf("endfunc\n"); } {}
 
 stmts: stmts stmt {}
 |stmt {}
@@ -121,7 +114,7 @@ exp: NUM {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("= %s, %s\n", name, $1);
-	$$ = name;
+	$$ = $1;
 }
 | SUB exp {
 	char* name = genTempName();
@@ -160,12 +153,8 @@ exp: NUM {
 
 rel_exp: exp REL exp {
 	char* name = genTempName();
-	char* op = $2;
-	if (!strcmp("=", op)) {
-		op = "==";
-	}
 	printf(". %s\n", name);
-	printf("%s %s, %s, %s\n", op, name, $1, $3);
+	printf("%s %s, %s, %s\n", $2, name, $1, $3);
 	$$ = name;
 }
 
@@ -182,7 +171,6 @@ stmt: assignment {}
 | dowhilst_stmt {}
 | function {}
 | return_stmt {}
-| function_call SEMICOLON {}
 
 return_stmt: RETURN SEMICOLON {
 	printf("ret 0\n");
@@ -210,73 +198,41 @@ when_head: WHEN L_PAREN add_exp R_PAREN {
 	printf("! %s, %s\n", name, $3);
 	printf("?:= %s, %s\n", $$.l2, name);
 }
-
-whilst_stmt: whilst_head LC stmts RC {
-	printf(":= %s\n", $1.l1);			//goto beginlabel
-	printf(": %s\n", $1.l2);			//endlabel
+	
+whilst_stmt: whilst_head whilst_body LC stmts RC{
+	printf("?:= %s\n", $1.l1);					//goto beginlabel
+	printf(": %s\n", $2.l1);					//print endlabel
 }
-<<<<<<< HEAD
-whilst_head: WHILST L_PAREN {
-=======
 
-whilst_head: WHILST L_PAREN add_exp R_PAREN{
->>>>>>> 4abc456d90ff13bb71027874ccfe7c331fb237c5
-	char* name = genTempName();
+whilst_head: WHILST{
 	$$.l1 = genLabelName(0);					//beginLabel
-	$$.l2 = genLabelName(0);					//endlabel
 	printf(": %s\n", $$.l1);					//print begin lable name
+}
+
+whilst_body: L_PAREN add_exp R_PAREN{
+	char* name = genTempName();
+	$$.l1 = genLabelName(0);					//endlabel
 	printf(". %s\n", name);						//print temp for add_exp
-	printf("! %s, %s\n", name, $3);				//compare 
-	printf("?:= %s, %s\n", $$.l2, name);		//if true goto endlabel
-} add_exp R_PAREN
+	printf("! %s, %s\n", name, $2);				//compare 
+	printf("?:= %s, %s\n", $$.l1, name);		//if true goto endlabel
+}
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }
 | DO LC RC WHILST exp { }
 
-function: type IDENTIFIER {
-	VecPush(&vec, $2);
-	printf("func %s\n", $2);
-} QM param_type_list QM LC stmts RC {
+function: type IDENTIFIER QM param_type_list { printf("func %s\n", $2); } QM LC stmts RC {
 	printf("endfunc\n");
 }
 
-function_call: IDENTIFIER QM param_list QM {
-	char* name = genTempName();
-	printf(". %s\n", name);
-	printf("call %s, %s\n", $1, name);
-	$$ = name;
-}
+function_call: IDENTIFIER QM param_list QM {}
 
-param_type_list: type IDENTIFIER COMMA param_type_list {
-	VecPush(&vec, $2);
-	printf(". %s\n", $2);
-	printf("= %s, %i\n", $2, $4 + 1);
-	$$ = $4 + 1;
-}
-| type IDENTIFIER LB RB COMMA param_type_list {
-	VecPush(&vec, $2);
-	printf("= %s, $%i\n", $2, $6 + 1);
-	$$ = $6 + 1;
-}
-| type IDENTIFIER {
-	VecPush(&vec, $2);
-	printf(". %s\n", $2);
-	printf("= %s, $%i\n", $2, 0);
-	$$ = 0;
-}
-| type IDENTIFIER LB RB {
-	VecPush(&vec, $2);
-	printf("= %s, $%i\n", $2, 0);
-	$$ = 0;
-}
-| {}
+param_type_list: type IDENTIFIER COMMA param_type_list {}
+| type IDENTIFIER LB RB COMMA param_type_list {}
+| type IDENTIFIER {}
+| type IDENTIFIER LB RB {}
 
-param_list: add_exp COMMA param_list {
-	printf("param %s\n", $1);
-}
-| add_exp {
-	printf("param %s\n", $1);
-}
+param_list: add_exp COMMA {}
+| add_exp {}
 | {}
 
 type: VOID {}
