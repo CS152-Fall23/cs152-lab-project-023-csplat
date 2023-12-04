@@ -114,7 +114,7 @@ exp: NUM {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("= %s, %s\n", name, $1);
-	$$ = name;
+	$$ = $1;
 }
 | SUB exp {
 	char* name = genTempName();
@@ -158,7 +158,7 @@ rel_exp: exp REL exp {
 	$$ = name;
 }
 
-stmt: assignment {}
+	printf("%s %s, %s, %s\n", op, name, $1, $3);
 | WRITE L_PAREN IDENTIFIER R_PAREN SEMICOLON {
 	printf(".> %s\n", $3);
 }
