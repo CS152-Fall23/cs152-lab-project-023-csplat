@@ -1,0 +1,5 @@
+# Error 3: Usage of an array but missing index value.
+int a[5];
+int b[4];
+a[4] := 3;
+b := 3;

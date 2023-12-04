@@ -1,0 +1,7 @@
+# Error 6: Out Of Scope. (Partially Working)
+
+int a;
+int b?int c?
+{
+    int a;
+}

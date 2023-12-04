@@ -379,6 +379,11 @@ assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
 		fprintf(stderr, "Usage of array '%s', missing index value.\n", $1);
 		exit(-1);
 	}
+	else if (!variableExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Undefined variable '%s'\n", $1);
+		exit(-1);
+	}
 	printf("= %s, %s\n", $1, $3);
 }
 

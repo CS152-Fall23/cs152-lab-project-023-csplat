@@ -1,0 +1,8 @@
+# Error 4: Usage of an undefined function.
+int a ?int b? 
+{
+    return b;
+}
+
+a?2?;
+b?4?;
