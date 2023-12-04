@@ -1,0 +1,6 @@
+# Error 1: Undefined usage of Array c.
+int a;
+int b[4];
+a := 2;;
+b[3] := a;
+c[2] := b[3];

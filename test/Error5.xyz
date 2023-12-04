@@ -1,0 +1,6 @@
+# Error 5: Usage of an undefined Variable.
+int a;
+int b;
+
+b := 10;
+c := 20;
