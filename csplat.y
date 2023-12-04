@@ -182,6 +182,11 @@ exp: NUM {
 		fprintf(stderr, "Usage of undefined array '%s'.\n", $1);
 		exit(-1);
 	}
+	else if (outOfBoundsCheck($1, atoi($3)))
+	{
+		fprintf(stderr, "Out of bounds, array '%s'.\n", $1);
+		exit(-1);
+	}
 
 
 	char* name = genTempName();
