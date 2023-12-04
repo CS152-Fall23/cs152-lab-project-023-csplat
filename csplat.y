@@ -114,7 +114,7 @@ exp: NUM {
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("= %s, %s\n", name, $1);
-	$$ = $1;
+	$$ = name;
 }
 | SUB exp {
 	char* name = genTempName();
