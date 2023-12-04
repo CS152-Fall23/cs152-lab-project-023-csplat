@@ -27,6 +27,7 @@ static char* genLabelName(int offset) {
 }
 
 typedef struct { char **data; size_t len; } Vec;
+typedef struct { int *data; size_t len; } VecInt;
 
 static void VecPush(Vec *vec, char *cstring) {
 	if ( !(vec->data = realloc(vec->data, sizeof(char *)*(vec->len + 1)))) {
@@ -35,12 +36,57 @@ static void VecPush(Vec *vec, char *cstring) {
 	vec->data[vec->len++] = cstring;
 }
 
+static void VecIntPush(VecInt *vec, int num) {
+	if ( !(vec->data = realloc(vec->data, sizeof(int)*(vec->len + 1)))) {
+		printf("bad_alloc\n"); exit(-1);
+	}
+	vec->data[vec->len++] = num;
+}
+
 static Vec vec;
+static Vec arrayVec;
+static Vec vecFunc;
+static VecInt vecSize;
 
 int variableExists(char *var) {
 	for (int i = 0; i < vec.len; ++i) {
 		if (0 == strcmp(vec.data[i], var)) {
 			return 1;
+		}
+	}
+	return 0;
+}
+
+int arrayExists(char *var) 
+{
+	for (int i = 0; i < arrayVec.len; ++i) {
+		if (0 == strcmp(arrayVec.data[i], var)) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+int functionExists(char *var) {
+	for (int i = 0; i < vecFunc.len; ++i)
+	{
+		if (0 == strcmp(vecFunc.data[i], var))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int outOfBoundsCheck(char *var, int index)
+{
+	for (int i = 0; i < arrayVec.len; ++i) {
+		if (0 == strcmp(arrayVec.data[i], var)) {
+			if (index >= vecSize.data[i])
+			{
+				return 1;
+			}
 		}
 	}
 	return 0;
@@ -140,6 +186,11 @@ exp: NUM {
 		fprintf(stderr, "Undefined variable '%s'\n", $1);
 		exit(-1);
 	}
+	else if (arrayExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Usage of array '%s', missing index value.\n", $1);
+		exit(-1);
+	}
 	$$ = $1;
 }
 | IDENTIFIER LB add_exp RB {
@@ -148,6 +199,18 @@ exp: NUM {
 		fprintf(stderr, "Undefined variable '%s'\n", $1);
 		exit(-1);
 	}
+	else if (!arrayExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Usage of undefined array '%s'.\n", $1);
+		exit(-1);
+	}
+	else if (outOfBoundsCheck($1, atoi($3)))
+	{
+		fprintf(stderr, "Out of bounds, array '%s'.\n", $1);
+		exit(-1);
+	}
+
+
 	char* name = genTempName();
 	printf(". %s\n", name);
 	printf("=[] %s, %s, %s\n", name, $1, $3);
@@ -229,6 +292,7 @@ dowhilst_stmt: DO LC stmts RC WHILST exp { }
 | DO LC RC WHILST exp { }
 
 function: type IDENTIFIER {
+  VecPush(&vecFunc, $2);
 	VecPush(&vec, $2);
 	printf("func %s\n", $2);
 } QM param_type_list QM LC stmts RC {
@@ -236,7 +300,11 @@ function: type IDENTIFIER {
 }
 
 function_call: IDENTIFIER QM param_list QM {
-	char* name = genTempName();
+	if (!functionExists($1))
+	{
+		fprintf(stderr, "Function '%s' not defined. \n", $1);
+	}
+  char* name = genTempName();
 	printf(". %s\n", name);
 	printf("call %s, %s\n", $1, name);
 	$$ = name;
@@ -278,23 +346,53 @@ type: VOID {}
 | INT {}
 
 declaration: type IDENTIFIER SEMICOLON {
+	if (variableExists($2)) {
+		printSemanticError();
+		fprintf(stderr, "Variable '%s' already defined in scope. \n", $2);
+		exit(-1);
+	}
 	VecPush(&vec, $2);
 	printf(". %s\n", $2);
 }
 | type IDENTIFIER LB NUM RB SEMICOLON {
-	VecPush(&vec, $2);
+	if (variableExists($2)) {
+		printSemanticError();
+		fprintf(stderr, "Variable '%s' already defined in scope. \n", $2);
+		exit(-1);
+	}
+
 	if (atoi($4) <= 0) {
 		printSemanticError();
 		fprintf(stderr, "Array size must be greater than zero!\n");
 		exit(-1);
 	}
+
+	VecPush(&vec, $2);
+	VecIntPush(&vecSize, atoi($4));
+	VecPush(&arrayVec, $2);
 	printf(".[] %s, %s\n", $2, $4);
 }
 
 assignment: IDENTIFIER ASSIGN add_exp SEMICOLON {
+	if (arrayExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Usage of array '%s', missing index value.\n", $1);
+		exit(-1);
+	}
 	printf("= %s, %s\n", $1, $3);
 }
+
 | IDENTIFIER LB add_exp RB ASSIGN add_exp SEMICOLON {
+	if (!arrayExists($1)) {
+		printSemanticError();
+		fprintf(stderr, "Usage of undefined array '%s'.\n", $1);
+		exit(-1);
+	}
+	else if (outOfBoundsCheck($1, atoi($3)))
+	{
+		fprintf(stderr, "Out of bounds, array '%s'.\n", $1);
+		exit(-1);
+	}
 	printf("[]= %s, %s, %s\n", $1, $3, $6);
 }
 
