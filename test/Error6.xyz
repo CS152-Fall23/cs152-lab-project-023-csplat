@@ -1,4 +1,4 @@
-# Error 6: Out Of Scope. (Partially Working)
+# Error 6: Variable Already Defined In Scope. (Partially Working)
 
 int a;
 int b?int c?
