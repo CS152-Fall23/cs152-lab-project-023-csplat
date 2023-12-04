@@ -67,9 +67,9 @@ void printSemanticError() {
    } control_flow;
 }
 
-%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp 
+%type<identifier> IDENTIFIER add_exp NUM exp REL rel_exp function_call mul_exp whilst_head
 
-%type<control_flow> when_head whilst_stmt whilst_head
+%type<control_flow> when_head whilst_stmt  
 
 %%
 
@@ -203,7 +203,7 @@ whilst_stmt: whilst_head LC stmts RC {
 	printf("?:= %s\n", $1.l1);			//goto beginlabel
 	printf(": %s\n", $1.l2);			//endlabel
 }
-whilst_head: WHILST L_PAREN add_exp R_PAREN{
+whilst_head: WHILST L_PAREN {
 	char* name = genTempName();
 	$$.l1 = genLabelName(0);					//beginLabel
 	$$.l2 = genLabelName(0);					//endlabel
@@ -211,7 +211,7 @@ whilst_head: WHILST L_PAREN add_exp R_PAREN{
 	printf(". %s\n", name);						//print temp for add_exp
 	printf("! %s, %s\n", name, $3);				//compare 
 	printf("?:= %s, %s\n", $$.l2, name);		//if true goto endlabel
-}
+} add_exp R_PAREN
 
 dowhilst_stmt: DO LC stmts RC WHILST exp { }
 | DO LC RC WHILST exp { }
