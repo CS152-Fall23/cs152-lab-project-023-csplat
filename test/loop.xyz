@@ -1,0 +1,8 @@
+int main?? {
+    int i;
+    i := 10;
+    whilst (i > 0) {
+        write(i);
+        i := i - 1;
+    }
+}

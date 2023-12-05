@@ -313,7 +313,7 @@ function_call: IDENTIFIER QM param_list QM {
 param_type_list: type IDENTIFIER COMMA param_type_list {
 	VecPush(&vec, $2);
 	printf(". %s\n", $2);
-	printf("= %s, %i\n", $2, $4 + 1);
+	printf("= %s, $%i\n", $2, $4 + 1);
 	$$ = $4 + 1;
 }
 | type IDENTIFIER LB RB COMMA param_type_list {

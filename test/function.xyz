@@ -1,0 +1,9 @@
+int test?int n, int add? {
+    return n + add;
+}
+
+int main?? {
+    int a;
+    a := test?5, 4?;
+    write(a);
+}
